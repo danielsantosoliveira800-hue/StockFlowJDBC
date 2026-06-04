@@ -1,12 +1,7 @@
 ### IntelliJ IDEA ###
-### IntelliJ IDEA ###
 .idea/
 *.iml
 out/
-.idea/
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 .kotlin
 
 ### Eclipse ###
@@ -18,8 +13,6 @@ out/
 .springBeans
 .sts4-cache
 bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
 
 ### NetBeans ###
 /nbproject/private/
@@ -33,3 +26,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Configurações locais ###
+config.properties

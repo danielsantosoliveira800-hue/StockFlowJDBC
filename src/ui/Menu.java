@@ -1,10 +1,15 @@
 package ui;
 
-import Service.ProdutoService;
+import service.MovimentacaoService;
+import service.ProdutoService;
+import model.Movimentacao;
 import model.Produto;
+import model.ProdutoRanking;
+import util.CsvExporter;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.InputMismatchException;
@@ -12,7 +17,8 @@ import java.util.InputMismatchException;
 public class Menu {
     private Scanner sc = new Scanner(System.in);
 
-    private ProdutoService service = new ProdutoService();
+    private ProdutoService produtoService = new ProdutoService();
+    private MovimentacaoService movimentacaoService = new MovimentacaoService();
 
     public void exibir() {
 
@@ -22,6 +28,7 @@ public class Menu {
 
             System.out.println(" ");
             System.out.println(" ===STOCK FLOW=== ");
+            System.out.println("-----------------------------------------");
             System.out.println("1- Cadastrar produto.");
             System.out.println("2- Listar produtos.");
             System.out.println("3- Atualizar preço.");
@@ -30,11 +37,15 @@ public class Menu {
             System.out.println("6- Buscar produto por nome.");
             System.out.println("7- Entrada de estoque.");
             System.out.println("8- Saida de estoque.");
-            System.out.println("9- Buscar produtos com estoue baixo.");
+            System.out.println("9- Buscar produtos com estoque baixo.");
             System.out.println("10- Buscar produtos ativos.");
             System.out.println("11- Calcular valor total em estoque.");
             System.out.println("12- Exibir Dashboard.");
-            System.out.println("13- Sair.");
+            System.out.println("13- Exibir movimentações.");
+            System.out.println("14- Buscar movimentações por data.");
+            System.out.println("15- Exibir ranking de produtos mais movimentados.");
+            System.out.println("16- Exportar CSV.");
+            System.out.println("17- Sair.");
             System.out.println(" ");
             System.out.print("Escolha uma opção: ");
             System.out.println(" ");
@@ -79,11 +90,23 @@ public class Menu {
                     exibirDashboard();
                 }
                 case 13 -> {
+                    exibirMovimentacoes();
+                }
+                case 14 ->{
+                    exibirMovimentacoesPorData();
+                }
+                case 15 -> {
+                    exibirProdutoRanking();
+                }
+                case 16 ->{
+                    exportarCSV();
+                }
+                case 17->{
                     System.out.println("Encerrando o sistema.");
                 }
                 default -> System.out.println("Opção inválida.");
             }
-        }while (opcao != 13);
+        }while (opcao != 17);
 
         sc.close();
     }
@@ -108,7 +131,7 @@ public class Menu {
                 quantidade,
                 status);
         try {
-            service.cadastrarProduto(produto);
+            produtoService.cadastrarProduto(produto);
 
         }catch (IllegalArgumentException e){
             System.out.println("ERRO: "+e.getMessage());
@@ -116,7 +139,7 @@ public class Menu {
     }
 
     private void listarProdutos() {
-        List<Produto> produtos = service.listar();
+        List<Produto> produtos = produtoService.listar();
 
         if (produtos.isEmpty()){
             System.out.println("Nenhum produto cadastrado.");
@@ -137,20 +160,31 @@ public class Menu {
     }
 
     private void atualizarProduto() {
-        System.out.println("id do produto: ");
-        int id = lerInteiro();
+        try {
+            System.out.println("id do produto: ");
 
-        System.out.println("Novo preço: R$");
-        double novoPreco = lerDouble();
+            int id = lerInteiro();
 
-        service.atualizarPreco(id,novoPreco);
+            System.out.println("Novo preço: R$");
+            double novoPreco = lerDouble();
+
+            produtoService.atualizarPreco(id, novoPreco);
+
+        }catch (IllegalArgumentException e){
+            System.out.println("Erro: produto não encontrado.");
+        }
     }
 
     private void deletarProduto() {
-        System.out.println("id do produto :");
-        int id = lerInteiro();
+        try {
+            System.out.println("id do produto :");
 
-        service.deletar(id);
+            int id = lerInteiro();
+
+            produtoService.deletar(id);
+        }catch (IllegalArgumentException e){
+            System.out.println("Erro: produto não encontrado.");
+        }
     }
 
     private int lerInteiro() {
@@ -205,7 +239,7 @@ public class Menu {
 
         int id = lerInteiro();
 
-        Produto produto = service.buscarPorID(id);
+        Produto produto = produtoService.buscarPorID(id);
 
         if (produto != null){
             System.out.println("\n ===PRODUTO ENCONTRADO===");
@@ -244,7 +278,7 @@ public class Menu {
         System.out.println("Digite o nome do produto: ");
         String nome = lerString();
 
-        List<Produto> produtos = service.buscarPorNome(nome);
+        List<Produto> produtos = produtoService.buscarPorNome(nome);
 
         if (produtos.isEmpty()){
             System.out.println("Nenhum produto encontrado.");
@@ -268,11 +302,11 @@ public class Menu {
         System.out.println("Digite o id do produto: ");
         int id = lerInteiro();
 
-        System.out.println("Digite a nova a quantidade a adicionar no estoque: ");
+        System.out.println("Digite a nova a quantidade adicionar no estoque: ");
         int quantidade = lerInteiro();
 
         try {
-            service.entradaEstoque(id,quantidade);
+            produtoService.entradaEstoque(id,quantidade);
 
             System.out.println("Entrada realizada com sucesso.");
         }catch (IllegalArgumentException e){
@@ -288,7 +322,7 @@ public class Menu {
         int quantidade = lerInteiro();
 
         try {
-            service.saidaEstoque(id, quantidade);
+            produtoService.saidaEstoque(id, quantidade);
 
             System.out.println("Saida realizada com sucesso.");
 
@@ -300,7 +334,7 @@ public class Menu {
     private void listarEstoqueBaixo(){
 
         List<Produto> produtos =
-                service.buscarEstoqueBaixo();
+                produtoService.buscarEstoqueBaixo();
 
         if (produtos.isEmpty()){
             System.out.println("Nenhum produto com estoque baixo.");
@@ -322,7 +356,7 @@ public class Menu {
     }
 
     private void listarProdutosAtivos(){
-        List<Produto> produtos = service.buscarEstoqueAtivo();
+        List<Produto> produtos = produtoService.buscarEstoqueAtivo();
 
         if (produtos.isEmpty()){
             System.out.println("Nenhum produto ativo.");
@@ -344,19 +378,19 @@ public class Menu {
     }
 
     private void exibirValorTotalEstoque(){
-        double total = service.calcularValorTotalEstoque();
+        double total = produtoService.calcularValorTotalEstoque();
 
         System.out.println("\n === VALOR TOTAL DO ESTOQUE === ");
         System.out.printf("R$ %.2f%n", total);
     }
 
     private void exibirDashboard(){
-        int totalProdutos = service.contarProdutos();
-        int totalProdutosAtivos = service.contaProdutosAtivos();
-        int totalProdutosInativos = service.contaProdutosInativos();
-        int quantidadeTotalProdutos = service.somaQuantidadeProdutos();
-        double valorDoEstoque = service.calcularValorTotalEstoque();
-        List<Produto> estoqueBaixo = service.buscarEstoqueBaixo();
+        int totalProdutos = produtoService.contarProdutos();
+        int totalProdutosAtivos = produtoService.contaProdutosAtivos();
+        int totalProdutosInativos = produtoService.contaProdutosInativos();
+        int quantidadeTotalProdutos = produtoService.somaQuantidadeProdutos();
+        double valorDoEstoque = produtoService.calcularValorTotalEstoque();
+        List<Produto> estoqueBaixo = produtoService.buscarEstoqueBaixo();
 
         System.out.println("\n === TOTAL DE PRODUTOS === ");
         System.out.println("Produtos cadastrados: "+ totalProdutos);
@@ -381,5 +415,95 @@ public class Menu {
                 System.out.println("Produto -> "+ produto.getNome() + ", Quantidade ->" + produto.getQuantidade() );
             }
         }
+    }
+
+    private void exibirMovimentacoes(){
+        List<Movimentacao> movimentacoes = movimentacaoService.listarMovimentacoes();
+
+        exibirListaMovimentacoes(movimentacoes);
+    }
+
+    private void exibirMovimentacoesPorData(){
+       try {
+           System.out.println("Digite a data de inicio da análise: ");
+
+        String dataInicio = lerString();
+
+        System.out.println("Digite a data de fim da análise: ");
+        String dataFim = lerString();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+           LocalDate inicio = LocalDate.parse(dataInicio, formatter);
+
+           LocalDate fim = LocalDate.parse(dataFim, formatter);
+
+           if (inicio.isAfter(fim)){
+               System.out.println("A data de inicio não pode ser maior que a data final.");
+               return;
+           }
+
+        List<Movimentacao> movimentacoesPorPeriodo = movimentacaoService.buscarMovimentacoesPorData(inicio , fim);
+
+           exibirListaMovimentacoes(movimentacoesPorPeriodo);
+
+       }catch (DateTimeParseException e){
+
+           System.out.println("Formato de data inválida, por favor utilize (DD/MM/AAAA)");
+       }
+    }
+
+    private void exibirListaMovimentacoes (List<Movimentacao> movimentacoes){
+
+        if (movimentacoes.isEmpty()){
+            System.out.println("Nâo existe histórico de movimentações.");
+            return ;
+        }
+
+        System.out.println(" ");
+        System.out.println("\n === MOVIMENTAÇÕES CADASTRADAS === ");
+
+        for (Movimentacao movimentacao: movimentacoes) {
+
+            System.out.println(" ");
+            System.out.println("Nome do produto: "+ movimentacao.getNomeProduto());
+            System.out.println("Tipo de movimentação: "+ movimentacao.getTipo());
+            System.out.println("Quantidade: "+ movimentacao.getQuantidade());
+            System.out.println("Data da movimentacao: "+ movimentacao.getDataMovimentacao());
+            System.out.println("----------------------------------------------------------");
+
+        }
+    }
+
+    private void exibirProdutoRanking(){
+        List<ProdutoRanking> rankingDeProdutos = produtoService.buscarProdutoRanking();
+
+        if (rankingDeProdutos.isEmpty()){
+            System.out.println("Lista de ranking vazia.");
+            return;
+        }
+
+        int posicao = 1;
+
+        for (ProdutoRanking produtoRanking : rankingDeProdutos) {
+
+            System.out.println("\n === "+ posicao +"º LUGAR ===");
+            System.out.println(" ");
+            System.out.println("Produto: "+ produtoRanking.getNomeProduto());
+            System.out.println("Movimentações: "+ produtoRanking.getTotalMovimentacoes());
+            System.out.println("Quantidade movimentada: "+ produtoRanking.getQuantidadeMovimentada());
+            System.out.println("---------------------------------");
+            System.out.println(" ");
+
+            posicao++;
+        }
+    }
+
+    private void exportarCSV(){
+        List<ProdutoRanking> ranking = produtoService.buscarProdutoRanking();
+
+        CsvExporter csvExporter = new CsvExporter();
+
+        csvExporter.exportarRankingProdutos(ranking);
     }
 }

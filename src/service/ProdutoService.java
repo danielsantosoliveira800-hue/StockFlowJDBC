@@ -1,12 +1,13 @@
-package Service;
+package service;
 import dao.ProdutoDAO;
 import model.Produto;
+import model.ProdutoRanking;
 
 import java.util.List;
 
 public class ProdutoService {
 
-    private ProdutoDAO dao = new ProdutoDAO();
+    private ProdutoDAO produtoDao = new ProdutoDAO();
 
     public void cadastrarProduto(Produto produto){
         if (produto.getNome() == null
@@ -26,11 +27,13 @@ public class ProdutoService {
 
         }
 
-        dao.salvarProduto(produto);
+        produto.setStatus(produto.getStatus().trim().toUpperCase());
+
+        produtoDao.salvarProduto(produto);
     }
 
     public List<Produto> listar(){
-        return dao.listar();
+        return produtoDao.listar();
     }
 
     public void atualizarPreco(int id, double novoPreco){
@@ -38,7 +41,12 @@ public class ProdutoService {
             throw new IllegalArgumentException("Preço inválido");
         }
 
-        dao.atualizar(id,novoPreco);
+        Produto produto = produtoDao.buscar(id);
+
+        if (produto == null){
+            throw new IllegalArgumentException("Produto não encontrado.");
+        }
+        produtoDao.atualizar(id,novoPreco);
     }
 
     public void deletar(int id) {
@@ -47,22 +55,28 @@ public class ProdutoService {
             throw new IllegalArgumentException("ID inválido.");
         }
 
-        dao.deletar(id);
+        Produto produto = produtoDao.buscar(id);
+
+        if (produto == null){
+            throw new IllegalArgumentException("Produto não encontrado");
+        }
+
+        produtoDao.deletar(id);
     }
 
     public Produto buscarPorID(int id) {
         if (id <= 0){
             throw new IllegalArgumentException("ID inválido");
         }
-        return dao.buscar(id);
+        return produtoDao.buscar(id);
     }
 
     public List<Produto> buscarPorNome(String nome) {
 
         if (nome == null || nome .trim().isEmpty()){
-            throw new IllegalArgumentException("Nomw inválido.");
+            throw new IllegalArgumentException("Nome inválido.");
         }
-        return dao.buscarPorNome(nome);
+        return produtoDao.buscarPorNome(nome);
     }
 
     public void entradaEstoque(int id, int quantidadeEntrada){
@@ -70,7 +84,7 @@ public class ProdutoService {
             throw new IllegalArgumentException("Quantidade inválida.");
         }
 
-        Produto produto =  dao.buscar(id);
+        Produto produto =  produtoDao.buscar(id);
 
         if (produto == null ){
             throw new IllegalArgumentException("Produto não encontrado.");
@@ -78,7 +92,7 @@ public class ProdutoService {
 
         int novaQuantidade = produto.getQuantidade() + quantidadeEntrada;
 
-        dao.atualizarQuantidade(id, novaQuantidade);
+        produtoDao.atualizarQuantidade(id, novaQuantidade);
     }
 
     public void saidaEstoque(int id, int quantidadeSaida){
@@ -86,7 +100,7 @@ public class ProdutoService {
             throw new IllegalArgumentException("Quantidade inválida");
         }
 
-        Produto produto = dao.buscar(id);
+        Produto produto = produtoDao.buscar(id);
 
         if (produto == null){
             throw new IllegalArgumentException("Produto não encontrado.");
@@ -98,34 +112,38 @@ public class ProdutoService {
 
         int novaQuantidade = produto.getQuantidade() - quantidadeSaida;
 
-        dao.atualizarQuantidade(id, novaQuantidade);
+        produtoDao.atualizarQuantidade(id, novaQuantidade);
     }
 
     public List<Produto> buscarEstoqueBaixo(){
-        return dao.buscarEstoqueBaixo();
+        return produtoDao.buscarEstoqueBaixo();
     }
 
     public List<Produto> buscarEstoqueAtivo(){
-        return dao.buscarProdutosAtivos();
+        return produtoDao.buscarProdutosAtivos();
     }
 
     public double calcularValorTotalEstoque(){
-        return dao.calcularValorTotalEstoque();
+        return produtoDao.calcularValorTotalEstoque();
     }
 
     public int contarProdutos(){
-        return dao.contaProdutos();
+        return produtoDao.contaProdutos();
     }
 
     public int contaProdutosAtivos(){
-        return dao.contaProdutosAtivos();
+        return produtoDao.contaProdutosAtivos();
     }
 
     public int contaProdutosInativos(){
-       return dao.contaProdutosInativos();
+       return produtoDao.contaProdutosInativos();
     }
 
     public int somaQuantidadeProdutos(){
-        return dao.qunatidadeTotalProdutos();
+        return produtoDao.quantidadeTotalProdutos();
+    }
+
+    public List<ProdutoRanking> buscarProdutoRanking(){
+        return produtoDao.buscarRankingProdutos();
     }
 }

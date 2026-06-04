@@ -2,8 +2,8 @@ package dao;
 
 import db.ConnectionFactory;
 import model.Produto;
+import model.ProdutoRanking;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -148,7 +148,7 @@ public class ProdutoDAO {
     public List<Produto> buscarPorNome(String nomeBusca) {
 
         String sql =
-                "SELECT * FROM produtos" +
+                "SELECT * FROM produtos " +
                         "WHERE nome LIKE ?";
 
         try (
@@ -168,16 +168,7 @@ public class ProdutoDAO {
             List<Produto> produtos = new ArrayList<>();
 
             while (resultSet.next()) {
-
-                Produto produto = new Produto();
-
-                produto.setId(resultSet.getInt("id"));
-                produto.setNome(resultSet.getString("nome"));
-                produto.setPreco(resultSet.getDouble("preco"));
-                produto.setQuantidade(resultSet.getInt("quantidade"));
-                produto.setStatus(resultSet.getString("status"));
-
-                produtos.add(produto);
+                produtos.add(mapearProduto(resultSet));
             }
 
             return produtos;
@@ -233,7 +224,7 @@ public class ProdutoDAO {
             }
             return produtos;
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -346,13 +337,14 @@ public class ProdutoDAO {
                 ResultSet resultSet =
                         statement.executeQuery();
                 )
-        {if (resultSet.next()){
+        {
+            if (resultSet.next()){
             return resultSet.getInt("total");
         }
             return 0;
 
         }catch (SQLException e){
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -373,7 +365,8 @@ public class ProdutoDAO {
                         statement.executeQuery();
 
                 )
-        {if (resultSet.next()){
+        {
+            if (resultSet.next()){
             return resultSet.getInt("total");
 
         }
@@ -384,7 +377,7 @@ public class ProdutoDAO {
         }
     }
 
-    public int qunatidadeTotalProdutos(){
+    public int quantidadeTotalProdutos(){
         String sql =
                 "SELECT SUM(quantidade) AS total "+
                 "FROM produtos ";
@@ -400,12 +393,54 @@ public class ProdutoDAO {
                         statement.executeQuery();
 
                 )
-        {if (resultSet.next()){
+        {
+            if (resultSet.next()){
             return resultSet.getInt("total");
         }
         return  0;
 
         }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<ProdutoRanking> buscarRankingProdutos(){
+        String sql =
+                "SELECT " +
+                        "p.id, " +
+                        "p.nome, " +
+                        "COUNT(*) AS  total_movimentacoes, " +
+                        "SUM(m.quantidade) AS quantidade_movimentada " +
+                        "FROM movimentacoes m " +
+                        "INNER JOIN produtos p " +
+                        "ON m.produto_id = p.id " +
+                        "GROUP BY p.id, p.nome " +
+                        "ORDER BY total_movimentacoes DESC ";
+
+        try (
+                Connection connection =
+                         ConnectionFactory.getConnection();
+
+                PreparedStatement statement =
+                        connection.prepareStatement(sql);
+
+                ResultSet resultSet =
+                        statement.executeQuery())
+        {
+            List<ProdutoRanking> rankingDeProdutos = new ArrayList<>();
+
+            while (resultSet.next()){
+                ProdutoRanking produtoRanking = new ProdutoRanking();
+
+                produtoRanking.setNomeProduto(resultSet.getString("nome"));
+                produtoRanking.setQuantidadeMovimentada(resultSet.getInt("quantidade_movimentada"));
+                produtoRanking.setTotalMovimentacoes(resultSet.getInt("total_movimentacoes"));
+
+                rankingDeProdutos.add(produtoRanking);
+            }
+            return rankingDeProdutos;
+        }catch (SQLException e){
+
             throw new RuntimeException(e);
         }
     }

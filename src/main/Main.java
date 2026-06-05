@@ -13,15 +13,5 @@ public class Main {
     public static void main(String[] args) {
         Menu menu = new Menu();
         menu.exibir();
-
-        /*MovimentacaoDAO dao =
-                new MovimentacaoDAO();
-
-        Movimentacao movimentacao =
-                new Movimentacao(2, "ENTRADA", 10);
-
-        dao.registrarMovimentacao(movimentacao);
-
-        System.out.println("Movimentação registrada.");*/
     }
 }

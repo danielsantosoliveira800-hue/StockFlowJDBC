@@ -105,6 +105,20 @@ src/
 * Manipulação de Arquivos
 * Tratamento de Exceções
 
+## Capturas de Tela
+
+### Menu Principal
+
+![Menu Principal](screenshots/menu-principal.png)
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Ranking de Produtos
+
+![Ranking de Produtos](screenshots/ranking-produtos.png)
+
 ## Autor
 
 Daniel Santos Oliveira

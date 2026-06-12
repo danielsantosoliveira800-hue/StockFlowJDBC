@@ -1,16 +1,17 @@
 package dao;
 import db.ConnectionFactory;
 import model.Movimentacao;
+import model.TipoMovimentacao;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class MovimentacaoDAO {
+public class MovimentacaoDAO implements MovimentacaoRepository{
 
-    public void registrarMovimentacao(Movimentacao movimentacao){
+    @Override
+    public void registrarMovimentacao(Connection connection, Movimentacao movimentacao){
 
         String sql =
                 " INSERT INTO movimentacoes "+
@@ -18,25 +19,22 @@ public class MovimentacaoDAO {
                 "VALUES (?, ?, ?)";
 
         try (
-                Connection connection =
-                        ConnectionFactory.getConnection();
-
                 PreparedStatement statement =
-                        connection.prepareStatement(sql);
+                        connection.prepareStatement(sql)
 
                 )
         {
 
             statement.setInt(1,movimentacao.getProduto_id());
 
-            statement.setString(2, movimentacao.getTipo());
+            statement.setString(2, movimentacao.getTipo().name());
 
             statement.setInt(3, movimentacao.getQuantidade());
 
             statement.executeUpdate();
 
         }catch (SQLException e){
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -45,7 +43,7 @@ public class MovimentacaoDAO {
 
         movimentacao.setId(rs.getInt("id"));
         movimentacao.setProduto_id(rs.getInt("produto_id"));
-        movimentacao.setTipo(rs.getString("tipo"));
+        movimentacao.setTipo(TipoMovimentacao.valueOf(rs.getString("tipo")));
         movimentacao.setQuantidade(rs.getInt("quantidade"));
         movimentacao.setDataMovimentacao(rs.getDate("data_movimentacao").toLocalDate());
         movimentacao.setNomeProduto(rs.getString("nome"));
@@ -53,6 +51,7 @@ public class MovimentacaoDAO {
         return movimentacao;
     }
 
+    @Override
     public List<Movimentacao> listar(){
         String sql =
                 "SELECT m.id," +
@@ -87,11 +86,13 @@ public class MovimentacaoDAO {
         }
     }
 
-    public List<Movimentacao> buscarPorPeriodo(LocalDate dataInicio, LocalDate dataFim){
+    @Override
+    public List<Movimentacao> buscarPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
         String sql = "SELECT " +
                 "m.id, " +
                 "m.produto_id, " +
                 "p.nome, " +
+                "m.tipo," +
                 "m.quantidade, " +
                 "m.data_movimentacao " +
                 "FROM movimentacoes m " +
@@ -100,27 +101,26 @@ public class MovimentacaoDAO {
                 "WHERE m.data_movimentacao " +
                 "BETWEEN ? AND ? ";
 
-        try (
-                Connection connection = ConnectionFactory.getConnection();
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql))
+        {
+            statement.setDate(1, Date.valueOf(dataInicio));
+            statement.setDate(2, Date.valueOf(dataFim));
 
-                PreparedStatement statement = connection.prepareStatement(sql);
-        ){
+            try (ResultSet resultSet = statement.executeQuery()){
 
-                statement.setDate(1, Date.valueOf(dataInicio));
-                statement.setDate(2, Date.valueOf(dataFim));
+                List<Movimentacao> listaPorDatas = new ArrayList<>();
 
-            ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()){
+                    listaPorDatas.add(mapearMovimentacao(resultSet));
+                }
 
-            List<Movimentacao> listaPorDatas = new ArrayList<>();
-
-            while (resultSet.next()){
-                listaPorDatas.add(mapearMovimentacao(resultSet));
+                return listaPorDatas;
             }
 
-            return listaPorDatas;
-
         }catch (SQLException e){
+
             throw new RuntimeException(e);
         }
-    }
+        }
 }

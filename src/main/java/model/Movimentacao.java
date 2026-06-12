@@ -6,14 +6,14 @@ public class Movimentacao {
 
     private int id;
     private int produto_id;
-    private String tipo;
+    private TipoMovimentacao tipo;
     private int quantidade;
     private LocalDate dataMovimentacao;
     private String nomeProduto;
 
     public Movimentacao(){};
 
-    public Movimentacao(int produto_id, String tipo, int quantidade) {
+    public Movimentacao(int produto_id, TipoMovimentacao tipo, int quantidade) {
         this.produto_id = produto_id;
         this.tipo = tipo;
         this.quantidade = quantidade;
@@ -43,11 +43,11 @@ public class Movimentacao {
         this.produto_id = produto_id;
     }
 
-    public String getTipo() {
+    public TipoMovimentacao getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoMovimentacao tipo) {
         this.tipo = tipo;
     }
 

@@ -8,8 +8,7 @@ import java.util.List;
 public class CsvExporter {
 
     public void exportarRankingProdutos(List<ProdutoRanking> ranking ) {
-        try {
-            FileWriter writer = new FileWriter("ranking.csv");
+        try (FileWriter writer = new FileWriter("ranking.csv")){
 
             writer.write("Produto;Movimentacoes;QuantidadeMovimentada\n");
 
@@ -22,8 +21,6 @@ public class CsvExporter {
 
                 writer.write(linha + "\n");
             }
-
-            writer.close();
             System.out.println("Arquivo CSV exportado com sucesso.");
 
         }catch (IOException e){

@@ -3,13 +3,15 @@ package dao;
 import db.ConnectionFactory;
 import model.Produto;
 import model.ProdutoRanking;
+import model.StatusProduto;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProdutoDAO {
+public class ProdutoDAO implements ProdutoRepository {
 
+    @Override
     public void salvarProduto(Produto produto) {
 
         String sql =
@@ -28,16 +30,16 @@ public class ProdutoDAO {
             statement.setString(1, produto.getNome());
             statement.setDouble(2, produto.getPreco());
             statement.setInt(3, produto.getQuantidade());
-            statement.setString(4, produto.getStatus());
+            statement.setString(4, produto.getStatus().name());
 
             statement.executeUpdate();
 
-            System.out.println("Produto salvo com sucesso.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Override
     public List<Produto> listar() {
 
         String sql = "SELECT * FROM PRODUTOS";
@@ -67,6 +69,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public void atualizar(int id, double novoPreco) {
 
         String sql = " UPDATE produtos " +
@@ -87,12 +90,12 @@ public class ProdutoDAO {
 
             statement.executeUpdate();
 
-            System.out.println("Preço atualizado com sucesso.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Override
     public void deletar(int id) {
 
         String sql = "DELETE FROM  produtos " +
@@ -109,33 +112,53 @@ public class ProdutoDAO {
 
             statement.executeUpdate();
 
-            System.out.println("Produto excluido com sucesso.");
-
         } catch (SQLException e) {
 
             throw new RuntimeException(e);
         }
     }
 
-    public Produto buscar(int id) {
+    @Override
+    public Produto buscar(Connection connection ,int id){
         String sql =
                 "SELECT * FROM produtos " +
-                        "WHERE id = ?";
-        try (
-                Connection connection =
-                        ConnectionFactory.getConnection();
+                        "WHERE id = ? ";
 
+        try (
                 PreparedStatement statement =
-                        connection.prepareStatement(sql)) {
+                    connection.prepareStatement(sql);)
+        {
             statement.setInt(1, id);
 
             ResultSet resultSet =
                     statement.executeQuery();
 
-            if (resultSet.next()) {
-
+            if (resultSet.next()){
                 return mapearProduto(resultSet);
 
+            }
+
+            return null;
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Produto buscar(int id) {
+        String sql = "SELECT * FROM produtos WHERE id = ?";
+
+        try (
+                Connection connection = ConnectionFactory.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+
+            statement.setInt(1, id);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return mapearProduto(resultSet);
             }
 
             return null;
@@ -145,6 +168,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public List<Produto> buscarPorNome(String nomeBusca) {
 
         String sql =
@@ -177,16 +201,14 @@ public class ProdutoDAO {
         }
     }
 
-    public void atualizarQuantidade(int id, int novaQuantidade) {
+    @Override
+    public void atualizarQuantidade(Connection connection, int id, int novaQuantidade) {
         String sql =
                 "UPDATE produtos " +
                         "SET quantidade  = ? " +
                         "WHERE id = ? ";
 
         try (
-                Connection connection =
-                        ConnectionFactory.getConnection();
-
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
         ) {
@@ -201,6 +223,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public List<Produto> buscarEstoqueBaixo() {
         String sql = "SELECT * FROM produtos " +
                 "WHERE quantidade <= 5 ";
@@ -228,6 +251,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public List<Produto> buscarProdutosAtivos() {
         String sql =
                 "SELECT * FROM produtos " +
@@ -256,6 +280,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public double calcularValorTotalEstoque() {
         String sql = "SELECT SUM(preco * quantidade) AS total " +
                 "FROM produtos ";
@@ -288,12 +313,13 @@ public class ProdutoDAO {
         produto.setNome(rs.getString("nome"));
         produto.setPreco(rs.getDouble("preco"));
         produto.setQuantidade(rs.getInt("quantidade"));
-        produto.setStatus(rs.getString("status"));
+        produto.setStatus(StatusProduto.valueOf(rs.getString("status")));
 
 
         return produto;
     }
 
+    @Override
     public int contaProdutos(){
         String sql =
                 " SELECT COUNT(*) AS total "+
@@ -321,6 +347,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public int contaProdutosAtivos(){
         String sql =
                 "SELECT COUNT(*) AS total "+
@@ -348,6 +375,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public int contaProdutosInativos(){
         String sql =
                 "SELECT COUNT(*) AS total "+
@@ -377,6 +405,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public int quantidadeTotalProdutos(){
         String sql =
                 "SELECT SUM(quantidade) AS total "+
@@ -404,6 +433,7 @@ public class ProdutoDAO {
         }
     }
 
+    @Override
     public List<ProdutoRanking> buscarRankingProdutos(){
         String sql =
                 "SELECT " +

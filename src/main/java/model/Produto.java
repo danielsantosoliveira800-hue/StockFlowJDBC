@@ -1,25 +1,22 @@
 package model;
 
-import java.util.List;
-
 public class Produto {
     private int id;
     private String nome;
     private double preco;
     private int quantidade;
-    private String status;
+    private StatusProduto status;
 
     public Produto(){
 
     }
 
     public Produto(
-                String nome,
-                double preco,
-                int quantidade,
-                String status
+            String nome,
+            double preco,
+            int quantidade,
+            StatusProduto status
     ) {
-                this.id = id;
                 this.nome = nome;
                 this.preco = preco;
                 this.quantidade = quantidade;
@@ -58,11 +55,11 @@ public class Produto {
         this.quantidade = quantidade;
     }
 
-    public String getStatus() {
+    public StatusProduto getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusProduto status) {
         this.status = status;
     }
 

@@ -1,5 +1,8 @@
 package ui;
 
+import dao.MovimentacaoDAO;
+import dao.ProdutoDAO;
+import model.StatusProduto;
 import service.MovimentacaoService;
 import service.ProdutoService;
 import model.Movimentacao;
@@ -17,8 +20,13 @@ import java.util.InputMismatchException;
 public class Menu {
     private Scanner sc = new Scanner(System.in);
 
-    private ProdutoService produtoService = new ProdutoService();
-    private MovimentacaoService movimentacaoService = new MovimentacaoService();
+    private final ProdutoService produtoService;
+    private final MovimentacaoService movimentacaoService;
+
+    public Menu(ProdutoService produtoService, MovimentacaoService movimentacaoService) {
+        this.produtoService = produtoService;
+        this.movimentacaoService = movimentacaoService;
+    }
 
     public void exibir() {
 
@@ -123,16 +131,25 @@ public class Menu {
         int quantidade = lerInteiro();
 
         System.out.println("Digite o status desse produto: ");
-        String status = lerString();
+        String statusStr = lerString();
+
+        StatusProduto statusProduto;
+        try {
+            statusProduto = StatusProduto.valueOf(statusStr.trim().toUpperCase());
+        }catch (IllegalArgumentException e){
+            System.out.println("ERRO: "+e.getMessage());
+            return;
+        }
 
         Produto produto = new Produto(
                 nome,
                 preco,
                 quantidade,
-                status);
+                statusProduto);
+
         try {
             produtoService.cadastrarProduto(produto);
-
+            System.out.println("Produto cadastrado com sucesso.");
         }catch (IllegalArgumentException e){
             System.out.println("ERRO: "+e.getMessage());
         }
@@ -169,6 +186,7 @@ public class Menu {
             double novoPreco = lerDouble();
 
             produtoService.atualizarPreco(id, novoPreco);
+            System.out.println("Preço atualizado com sucesso.");
 
         }catch (IllegalArgumentException e){
             System.out.println("Erro: produto não encontrado.");
@@ -182,6 +200,8 @@ public class Menu {
             int id = lerInteiro();
 
             produtoService.deletar(id);
+            System.out.println("Produto deletado com sucesso.");
+
         }catch (IllegalArgumentException e){
             System.out.println("Erro: produto não encontrado.");
         }

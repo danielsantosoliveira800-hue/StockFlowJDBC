@@ -1,6 +1,7 @@
 package service;
 import dao.ProdutoDAO;
 import dao.ProdutoRepository;
+import exception.ProdutoNaoEncontradoException;
 import model.Movimentacao;
 import model.Produto;
 import model.ProdutoRanking;
@@ -125,7 +126,7 @@ public class ProdutoService {
         Produto produto = produtoRepository.buscar(id);
 
         if (produto == null){
-            throw new IllegalArgumentException("Produto não encontrado.");
+            throw new ProdutoNaoEncontradoException();
         }
 
         return produto;

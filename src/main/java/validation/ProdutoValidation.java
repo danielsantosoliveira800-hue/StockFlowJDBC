@@ -6,12 +6,12 @@ public class ProdutoValidation {
 
     public void validarProduto(Produto produto){
 
-        if (produto.getStatus() == null) {
-            throw new IllegalArgumentException("Status inválido.");
-        }
-
         if (produto == null){
             throw new IllegalArgumentException("Produto inválido.");
+        }
+
+        if (produto.getStatus() == null) {
+            throw new IllegalArgumentException("Status inválido.");
         }
 
         if (produto.getNome() == null || produto.getNome().trim().isEmpty()){

@@ -57,6 +57,7 @@ public class ProdutoServiceTest {
 
         when(produtoRepository.buscar(999)).thenReturn(null);
 
+
         assertThrows(ProdutoNaoEncontradoException.class, () -> produtoService.buscarPorID(999));
 
     }

@@ -19,7 +19,12 @@ public class Main {
         MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
         MovimentacaoValidation movimentacaoValidation =  new MovimentacaoValidation();
 
-        MovimentacaoService movimentacaoService = new MovimentacaoService(movimentacaoDAO, produtoDAO, movimentacaoValidation);
+        MovimentacaoService movimentacaoService = new MovimentacaoService
+                                                        (movimentacaoDAO,
+                                                        produtoDAO,
+                                                        movimentacaoValidation,
+                                                        ConnectionFactory.getDataSource());
+
         ProdutoValidation produtoValidation = new ProdutoValidation();
 
         ProdutoService produtoService = new ProdutoService(movimentacaoService, produtoDAO, produtoValidation);

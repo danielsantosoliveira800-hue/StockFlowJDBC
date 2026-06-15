@@ -3,6 +3,7 @@ package db;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -48,5 +49,9 @@ public class ConnectionFactory {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao conectar com o banco.");
         }
+    }
+
+    public static DataSource getDataSource() {
+        return dataSource;
     }
 }

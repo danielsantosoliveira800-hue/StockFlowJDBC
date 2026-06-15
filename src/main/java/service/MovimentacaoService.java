@@ -11,6 +11,7 @@ import model.Produto;
 import model.TipoMovimentacao;
 import validation.MovimentacaoValidation;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -20,25 +21,25 @@ public class MovimentacaoService {
 
     private static final TipoMovimentacao ENTRADA = TipoMovimentacao.ENTRADA;
     private static final TipoMovimentacao SAIDA = TipoMovimentacao.SAIDA;
-
     private final MovimentacaoRepository movimentacaoRepository;
-
     private final ProdutoRepository produtoRepository;
-
     private final MovimentacaoValidation movimentacaoValidation;
+    private final DataSource dataSource;
 
     public MovimentacaoService() {
 
-        this(new MovimentacaoDAO(),new ProdutoDAO(), new MovimentacaoValidation());
+        this(new MovimentacaoDAO(),new ProdutoDAO(), new MovimentacaoValidation(), ConnectionFactory.getDataSource());
     }
 
     public MovimentacaoService(MovimentacaoRepository movimentacaoRepository,
                                ProdutoRepository produtoRepository,
-                               MovimentacaoValidation movimentacaoValidation) {
+                               MovimentacaoValidation movimentacaoValidation,
+                               DataSource dataSource) {
 
         this.movimentacaoRepository = movimentacaoRepository;
         this.produtoRepository = produtoRepository;
         this.movimentacaoValidation = movimentacaoValidation;
+        this.dataSource = dataSource;
     }
 
     public void registrarMovimentacao(Movimentacao movimentacao) {
@@ -48,7 +49,7 @@ public class MovimentacaoService {
             Connection connection = null;
             try {
 
-                connection = ConnectionFactory.getConnection();
+                connection = dataSource.getConnection();
                 connection.setAutoCommit(false);
 
                 Produto produto = buscarProduto(connection, movimentacao.getProduto_id());

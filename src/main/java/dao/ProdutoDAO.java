@@ -436,16 +436,7 @@ public class ProdutoDAO implements ProdutoRepository {
     @Override
     public List<ProdutoRanking> buscarRankingProdutos(){
         String sql =
-                "SELECT " +
-                        "p.id, " +
-                        "p.nome, " +
-                        "COUNT(*) AS  total_movimentacoes, " +
-                        "SUM(m.quantidade) AS quantidade_movimentada " +
-                        "FROM movimentacoes m " +
-                        "INNER JOIN produtos p " +
-                        "ON m.produto_id = p.id " +
-                        "GROUP BY p.id, p.nome " +
-                        "ORDER BY total_movimentacoes DESC ";
+                "SELECT * FROM  vw_ranking_produtos";
 
         try (
                 Connection connection =

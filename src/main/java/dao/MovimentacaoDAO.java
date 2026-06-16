@@ -46,7 +46,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
         movimentacao.setTipo(TipoMovimentacao.valueOf(rs.getString("tipo")));
         movimentacao.setQuantidade(rs.getInt("quantidade"));
         movimentacao.setDataMovimentacao(rs.getDate("data_movimentacao").toLocalDate());
-        movimentacao.setNomeProduto(rs.getString("nome"));
+        movimentacao.setNomeProduto(rs.getString("nome_produto"));
 
         return movimentacao;
     }
@@ -54,15 +54,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
     @Override
     public List<Movimentacao> listar(){
         String sql =
-                "SELECT m.id," +
-                        "m.produto_id,"+
-                        "p.nome, " +
-                        "m.tipo, " +
-                        "m.quantidade, " +
-                        "m.data_movimentacao "+
-                "FROM movimentacoes m " +
-                        "INNER JOIN produtos p " +
-                        "on m.produto_id = p.id ";
+                "SELECT * FROM vw_historico_movimentacoes";
 
         try (
                 Connection connection = ConnectionFactory.getConnection();

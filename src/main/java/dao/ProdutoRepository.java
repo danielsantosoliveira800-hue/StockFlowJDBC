@@ -2,6 +2,7 @@ package dao;
 
 import model.Produto;
 import model.ProdutoRanking;
+import model.ResumoEstoque;
 
 import java.sql.Connection;
 import java.util.List;
@@ -39,4 +40,6 @@ public interface ProdutoRepository {
     int quantidadeTotalProdutos();
 
     List<ProdutoRanking> buscarRankingProdutos();
+
+    ResumoEstoque buscarResumoEstoque();
 }

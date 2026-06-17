@@ -2,10 +2,7 @@ package service;
 import dao.ProdutoDAO;
 import dao.ProdutoRepository;
 import exception.ProdutoNaoEncontradoException;
-import model.Movimentacao;
-import model.Produto;
-import model.ProdutoRanking;
-import model.TipoMovimentacao;
+import model.*;
 import validation.ProdutoValidation;
 
 import java.util.List;
@@ -149,4 +146,9 @@ public class ProdutoService {
             throw new IllegalArgumentException("Quantidade inválida.");
         }
     }
+
+    public ResumoEstoque buscarResumoEstoque(){
+        return produtoRepository.buscarResumoEstoque();
+    }
+
 }

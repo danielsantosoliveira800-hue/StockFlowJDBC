@@ -2,12 +2,9 @@ package ui;
 
 import dao.MovimentacaoDAO;
 import dao.ProdutoDAO;
-import model.StatusProduto;
+import model.*;
 import service.MovimentacaoService;
 import service.ProdutoService;
-import model.Movimentacao;
-import model.Produto;
-import model.ProdutoRanking;
 import util.CsvExporter;
 
 import java.time.LocalDate;
@@ -405,27 +402,25 @@ public class Menu {
     }
 
     private void exibirDashboard(){
-        int totalProdutos = produtoService.contarProdutos();
-        int totalProdutosAtivos = produtoService.contaProdutosAtivos();
-        int totalProdutosInativos = produtoService.contaProdutosInativos();
-        int quantidadeTotalProdutos = produtoService.somaQuantidadeProdutos();
-        double valorDoEstoque = produtoService.calcularValorTotalEstoque();
+
+        ResumoEstoque resumoEstoque = produtoService.buscarResumoEstoque();
+
         List<Produto> estoqueBaixo = produtoService.buscarEstoqueBaixo();
 
         System.out.println("\n === TOTAL DE PRODUTOS === ");
-        System.out.println("Produtos cadastrados: "+ totalProdutos);
+        System.out.println("Produtos cadastrados: "+ resumoEstoque.getTotalProdutos());
 
         System.out.println("\n === PRODUTOS ATIVOS === ");
-        System.out.println("Produtos ativos: "+ totalProdutosAtivos);
+        System.out.println("Produtos ativos: "+ resumoEstoque.getProdutosAtivos());
 
         System.out.println("\n === PRODUTOS INATIVOS === ");
-        System.out.println("Produtos inativos: "+ totalProdutosInativos);
+        System.out.println("Produtos inativos: "+ resumoEstoque.getProdutosInativos());
 
         System.out.println("\n === QUANTIDADE TOTAL DE PRODUTOS === ");
-        System.out.println("Quantidade total: "+ quantidadeTotalProdutos);
+        System.out.println("Quantidade total: "+ resumoEstoque.getQuantidadeTotalProdutos());
 
         System.out.println("\n === VALOR TOTAL DO ESTOQUE === ");
-        System.out.printf("Valor: R$ %.2f%n",valorDoEstoque);
+        System.out.printf("Valor: R$ %.2f%n",resumoEstoque.getValorTotalEstoque());
 
         System.out.println("\n === PRODUTOS COM ESTOQUE BAIXO === ");
         if (estoqueBaixo.isEmpty()){

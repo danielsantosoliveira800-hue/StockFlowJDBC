@@ -3,6 +3,7 @@ package dao;
 import db.ConnectionFactory;
 import model.Produto;
 import model.ProdutoRanking;
+import model.ResumoEstoque;
 import model.StatusProduto;
 
 import java.sql.*;
@@ -57,7 +58,7 @@ public class ProdutoDAO implements ProdutoRepository {
             while (resultSet.next()) {
 
                 Produto produto =
-                    mapearProduto(resultSet);
+                        mapearProduto(resultSet);
 
                 produtos.add(produto);
             }
@@ -119,27 +120,26 @@ public class ProdutoDAO implements ProdutoRepository {
     }
 
     @Override
-    public Produto buscar(Connection connection ,int id){
+    public Produto buscar(Connection connection, int id) {
         String sql =
                 "SELECT * FROM produtos " +
                         "WHERE id = ? ";
 
         try (
                 PreparedStatement statement =
-                    connection.prepareStatement(sql);)
-        {
+                        connection.prepareStatement(sql);) {
             statement.setInt(1, id);
 
             ResultSet resultSet =
                     statement.executeQuery();
 
-            if (resultSet.next()){
+            if (resultSet.next()) {
                 return mapearProduto(resultSet);
 
             }
 
             return null;
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -320,10 +320,10 @@ public class ProdutoDAO implements ProdutoRepository {
     }
 
     @Override
-    public int contaProdutos(){
+    public int contaProdutos() {
         String sql =
-                " SELECT COUNT(*) AS total "+
-                " FROM produtos ";
+                " SELECT COUNT(*) AS total " +
+                        " FROM produtos ";
 
         try (
                 Connection connection =
@@ -334,53 +334,51 @@ public class ProdutoDAO implements ProdutoRepository {
 
                 ResultSet resultSet =
                         statement.executeQuery();
-                )
+        ) {
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
+            }
 
-        {if (resultSet.next()){
-            return resultSet.getInt("total");
-        }
-
-        return 0;
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public int contaProdutosAtivos(){
-        String sql =
-                "SELECT COUNT(*) AS total "+
-                "FROM produtos "+
-                "WHERE status = 'ATIVO' ";
-
-        try (
-                Connection connection =
-                        ConnectionFactory.getConnection();
-
-                PreparedStatement statement =
-                        connection.prepareStatement(sql);
-
-                ResultSet resultSet =
-                        statement.executeQuery();
-                )
-        {
-            if (resultSet.next()){
-            return resultSet.getInt("total");
-        }
             return 0;
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public int contaProdutosInativos(){
+    public int contaProdutosAtivos() {
         String sql =
-                "SELECT COUNT(*) AS total "+
-                "FROM produtos "+
-                "WHERE status = 'INATIVO'";
+                "SELECT COUNT(*) AS total " +
+                        "FROM produtos " +
+                        "WHERE status = 'ATIVO' ";
+
+        try (
+                Connection connection =
+                        ConnectionFactory.getConnection();
+
+                PreparedStatement statement =
+                        connection.prepareStatement(sql);
+
+                ResultSet resultSet =
+                        statement.executeQuery();
+        ) {
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int contaProdutosInativos() {
+        String sql =
+                "SELECT COUNT(*) AS total " +
+                        "FROM produtos " +
+                        "WHERE status = 'INATIVO'";
 
         try (
                 Connection connection =
@@ -392,24 +390,23 @@ public class ProdutoDAO implements ProdutoRepository {
                 ResultSet resultSet =
                         statement.executeQuery();
 
-                )
-        {
-            if (resultSet.next()){
-            return resultSet.getInt("total");
+        ) {
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
 
-        }
-        return 0;
+            }
+            return 0;
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public int quantidadeTotalProdutos(){
+    public int quantidadeTotalProdutos() {
         String sql =
-                "SELECT SUM(quantidade) AS total "+
-                "FROM produtos ";
+                "SELECT SUM(quantidade) AS total " +
+                        "FROM produtos ";
 
         try (
                 Connection connection =
@@ -421,36 +418,34 @@ public class ProdutoDAO implements ProdutoRepository {
                 ResultSet resultSet =
                         statement.executeQuery();
 
-                )
-        {
-            if (resultSet.next()){
-            return resultSet.getInt("total");
-        }
-        return  0;
+        ) {
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
+            }
+            return 0;
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public List<ProdutoRanking> buscarRankingProdutos(){
+    public List<ProdutoRanking> buscarRankingProdutos() {
         String sql =
                 "SELECT * FROM  vw_ranking_produtos";
 
         try (
                 Connection connection =
-                         ConnectionFactory.getConnection();
+                        ConnectionFactory.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
 
                 ResultSet resultSet =
-                        statement.executeQuery())
-        {
+                        statement.executeQuery()) {
             List<ProdutoRanking> rankingDeProdutos = new ArrayList<>();
 
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 ProdutoRanking produtoRanking = new ProdutoRanking();
 
                 produtoRanking.setNomeProduto(resultSet.getString("nome"));
@@ -460,8 +455,39 @@ public class ProdutoDAO implements ProdutoRepository {
                 rankingDeProdutos.add(produtoRanking);
             }
             return rankingDeProdutos;
-        }catch (SQLException e){
+        } catch (SQLException e) {
 
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ResumoEstoque buscarResumoEstoque() {
+
+        String sql = "{CALL sp_resumo_estoque()}";
+
+        try (
+                Connection connection = ConnectionFactory.getConnection();
+                CallableStatement statement = connection.prepareCall(sql);
+                ResultSet rs = statement.executeQuery();
+        ) {
+
+            if (rs.next()) {
+
+                ResumoEstoque resumo = new ResumoEstoque();
+
+                resumo.setTotalProdutos(rs.getInt("total_produtos"));
+                resumo.setQuantidadeTotalProdutos(rs.getInt("quantidade_total"));
+                resumo.setValorTotalEstoque(rs.getDouble("valor_total_estoque"));
+                resumo.setProdutosAtivos(rs.getInt("produtos_ativos"));
+                resumo.setProdutosInativos(rs.getInt("produtos_inativos"));
+
+                return resumo;
+
+            }
+            return null;
+
+        }catch (SQLException e){
             throw new RuntimeException(e);
         }
     }

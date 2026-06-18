@@ -19,7 +19,7 @@ public interface ProdutoRepository {
 
     void atualizar(int id, double novoPreco);
 
-    void deletar(int id);
+    void desativar(int id);
 
     List<Produto> buscarPorNome(String nome);
 

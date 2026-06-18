@@ -4,6 +4,7 @@ import dao.MovimentacaoDAO;
 import dao.ProdutoDAO;
 import model.*;
 import service.MovimentacaoService;
+import service.AuditoriaProdutoService;
 import service.ProdutoService;
 import util.CsvExporter;
 
@@ -17,12 +18,16 @@ import java.util.InputMismatchException;
 public class Menu {
     private Scanner sc = new Scanner(System.in);
 
+    private final AuditoriaProdutoService auditoriaProdutoService;
     private final ProdutoService produtoService;
     private final MovimentacaoService movimentacaoService;
 
-    public Menu(ProdutoService produtoService, MovimentacaoService movimentacaoService) {
+    public Menu(ProdutoService produtoService,
+                MovimentacaoService movimentacaoService,
+                AuditoriaProdutoService auditoriaProdutoService) {
         this.produtoService = produtoService;
         this.movimentacaoService = movimentacaoService;
+        this.auditoriaProdutoService = auditoriaProdutoService;
     }
 
     public void exibir() {
@@ -37,7 +42,7 @@ public class Menu {
             System.out.println("1- Cadastrar produto.");
             System.out.println("2- Listar produtos.");
             System.out.println("3- Atualizar preço.");
-            System.out.println("4- Deletar produto.");
+            System.out.println("4- Desativar produto.");
             System.out.println("5- Buscar produto por id. ");
             System.out.println("6- Buscar produto por nome.");
             System.out.println("7- Entrada de estoque.");
@@ -50,7 +55,8 @@ public class Menu {
             System.out.println("14- Buscar movimentações por data.");
             System.out.println("15- Exibir ranking de produtos mais movimentados.");
             System.out.println("16- Exportar CSV.");
-            System.out.println("17- Sair.");
+            System.out.println("17- Auditoria.");
+            System.out.println("18- Sair.");
             System.out.println(" ");
             System.out.print("Escolha uma opção: ");
             System.out.println(" ");
@@ -68,7 +74,7 @@ public class Menu {
                     atualizarProduto();
                 }
                 case 4 -> {
-                    deletarProduto();
+                    desativarProduto();
                 }
                 case 5 ->{
                     buscarProdutoPorId();
@@ -106,12 +112,15 @@ public class Menu {
                 case 16 ->{
                     exportarCSV();
                 }
-                case 17->{
+                case 17 ->{
+                    auditoria();
+                }
+                case 18->{
                     System.out.println("Encerrando o sistema.");
                 }
                 default -> System.out.println("Opção inválida.");
             }
-        }while (opcao != 17);
+        }while (opcao != 18);
 
         sc.close();
     }
@@ -190,14 +199,14 @@ public class Menu {
         }
     }
 
-    private void deletarProduto() {
+    private void desativarProduto() {
         try {
             System.out.println("id do produto :");
 
             int id = lerInteiro();
 
-            produtoService.deletar(id);
-            System.out.println("Produto deletado com sucesso.");
+            produtoService.desativar(id);
+            System.out.println("Produto desativado com sucesso.");
 
         }catch (IllegalArgumentException e){
             System.out.println("Erro: produto não encontrado.");
@@ -520,5 +529,37 @@ public class Menu {
         CsvExporter csvExporter = new CsvExporter();
 
         csvExporter.exportarRankingProdutos(ranking);
+    }
+
+    private void auditoria(){
+
+        List<AuditoriaProdutos> auditorias = auditoriaProdutoService.listarAuditorias();
+
+        if (auditorias.isEmpty()){
+            System.out.println("Nenhuma auditoria encontrada.");
+            return;
+        }
+
+        for (AuditoriaProdutos auditoria : auditorias) {
+
+            System.out.println("---------------------------------------------");
+            System.out.println("Operção: "+ auditoria.getOperacao());
+            System.out.println("Produto id: "+ auditoria.getProdutoId());
+
+            System.out.println("Nome antigo: "+ auditoria.getNomeAntigo());
+            System.out.println("Nome novo: "+ auditoria.getNomeNovo());
+
+            System.out.println("Preço antigo: R$ "+ auditoria.getPrecoAntigo());
+            System.out.println("Preço novo: R$ "+ auditoria.getPrecoNovo());
+
+            System.out.println("Quantidade antiga: "+ auditoria.getQuantidadeAntiga());
+            System.out.println("Quantidade novo: "+ auditoria.getQuantidadeNova());
+
+            System.out.println("Status antigo: "+ auditoria.getStatusAntigo());
+            System.out.println("Status novo: "+ auditoria.getStatusNovo());
+
+            System.out.println("Usuário banco: "+ auditoria.getUsuarioBanco());
+            System.out.println("Data da alterção: "+ auditoria.getDataAlteracao());
+        }
     }
 }

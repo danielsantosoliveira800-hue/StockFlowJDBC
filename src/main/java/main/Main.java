@@ -5,6 +5,7 @@ import dao.ProdutoDAO;
 import db.ConnectionFactory;
 import model.Movimentacao;
 import model.Produto;
+import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;
 import ui.Menu;
@@ -18,6 +19,7 @@ public class Main {
         ProdutoDAO produtoDAO = new ProdutoDAO();
         MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
         MovimentacaoValidation movimentacaoValidation =  new MovimentacaoValidation();
+        AuditoriaProdutoService auditoriaProdutoService = new AuditoriaProdutoService();
 
         MovimentacaoService movimentacaoService = new MovimentacaoService
                                                         (movimentacaoDAO,
@@ -29,7 +31,7 @@ public class Main {
 
         ProdutoService produtoService = new ProdutoService(movimentacaoService, produtoDAO, produtoValidation);
 
-        Menu menu = new Menu(produtoService, movimentacaoService);
+        Menu menu = new Menu(produtoService, movimentacaoService, auditoriaProdutoService);
 
         menu.exibir();
     }

@@ -97,10 +97,11 @@ public class ProdutoDAO implements ProdutoRepository {
     }
 
     @Override
-    public void deletar(int id) {
+    public void desativar(int id) {
 
-        String sql = "DELETE FROM  produtos " +
-                "WHERE id = ? ";
+        String sql = "UPDATE produtos"+
+                     "SET status = 'INATIVO' "+
+                     "WHERE id = ?";
 
         try (
                 Connection connection =

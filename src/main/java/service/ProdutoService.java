@@ -44,11 +44,11 @@ public class ProdutoService {
         produtoRepository.atualizar(id,novoPreco);
     }
 
-    public void deletar(int id) {
+    public void desativar(int id)   {
 
         Produto produto = buscarProduto(id);
 
-        produtoRepository.deletar(id);
+        produtoRepository.desativar(produto.getId());
     }
 
     public Produto buscarPorID(int id) {

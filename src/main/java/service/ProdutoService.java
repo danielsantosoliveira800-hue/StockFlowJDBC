@@ -151,4 +151,11 @@ public class ProdutoService {
         return produtoRepository.buscarResumoEstoque();
     }
 
+    public double calcularValorProduto(int id){
+
+        buscarProduto(id);
+
+        return produtoRepository.calcularValorProduto(id);
+    }
+
 }

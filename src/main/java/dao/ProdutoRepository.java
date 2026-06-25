@@ -42,4 +42,6 @@ public interface ProdutoRepository {
     List<ProdutoRanking> buscarRankingProdutos();
 
     ResumoEstoque buscarResumoEstoque();
+
+    double calcularValorProduto(int id);
 }

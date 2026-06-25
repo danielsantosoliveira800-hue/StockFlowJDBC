@@ -492,4 +492,28 @@ public class ProdutoDAO implements ProdutoRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public double calcularValorProduto(int id) {
+        String sql = "{ ? =  call fn_calcular_valor_produto(?) }";
+
+        try (
+                Connection connection = ConnectionFactory.getConnection();
+
+                CallableStatement statement = connection.prepareCall(sql);
+
+                )
+        {
+            statement.registerOutParameter(1, Types.DECIMAL);
+
+            statement.setInt(2, id);
+
+            statement.execute();
+
+            return statement.getDouble(1);
+
+        }catch (SQLException e){
+            throw new RuntimeException( e );
+        }
+    }
 }

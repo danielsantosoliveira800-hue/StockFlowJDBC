@@ -1,7 +1,5 @@
 package ui;
 
-import dao.MovimentacaoDAO;
-import dao.ProdutoDAO;
 import model.*;
 import service.MovimentacaoService;
 import service.AuditoriaProdutoService;
@@ -56,7 +54,8 @@ public class Menu {
             System.out.println("15- Exibir ranking de produtos mais movimentados.");
             System.out.println("16- Exportar CSV.");
             System.out.println("17- Auditoria.");
-            System.out.println("18- Sair.");
+            System.out.println("18- Calcular Valor Total de um produto.");
+            System.out.println("19- Sair.");
             System.out.println(" ");
             System.out.print("Escolha uma opção: ");
             System.out.println(" ");
@@ -115,14 +114,28 @@ public class Menu {
                 case 17 ->{
                     auditoria();
                 }
-                case 18->{
+                case 18 ->{
+                    calcularValorProduto();
+                }
+                case 19->{
                     System.out.println("Encerrando o sistema.");
                 }
                 default -> System.out.println("Opção inválida.");
             }
-        }while (opcao != 18);
+        }while (opcao != 19);
 
         sc.close();
+    }
+
+    private void calcularValorProduto() {
+        System.out.println("Digite o id do produto: ");
+
+        int id = lerInteiro();
+
+        double valor = produtoService.calcularValorProduto(id);
+
+        System.out.printf("Valor total do produto em estoque: R$ %.2f%n", valor);
+
     }
 
     private void salvarProduto() {

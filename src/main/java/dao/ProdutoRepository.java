@@ -44,4 +44,6 @@ public interface ProdutoRepository {
     ResumoEstoque buscarResumoEstoque();
 
     double calcularValorProduto(int id);
+
+    void inserirProdutoEmLote(List<Produto> produtos);
 }

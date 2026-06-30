@@ -55,7 +55,8 @@ public class Menu {
             System.out.println("16- Exportar CSV.");
             System.out.println("17- Auditoria.");
             System.out.println("18- Calcular Valor Total de um produto.");
-            System.out.println("19- Sair.");
+            System.out.println("19- Inserir produtos em lote.");
+            System.out.println("20- Sair.");
             System.out.println(" ");
             System.out.print("Escolha uma opção: ");
             System.out.println(" ");
@@ -117,14 +118,31 @@ public class Menu {
                 case 18 ->{
                     calcularValorProduto();
                 }
-                case 19->{
+                case 19 ->{
+                    inserirProdutosEmLote();
+                }
+                case 20->{
                     System.out.println("Encerrando o sistema.");
                 }
                 default -> System.out.println("Opção inválida.");
             }
-        }while (opcao != 19);
+        }while (opcao != 20);
 
         sc.close();
+    }
+
+    private void inserirProdutosEmLote() {
+        System.out.println("Quantos produtos deseja inserir?");
+        int quantidade = lerInteiro();
+
+        long inicio = System.currentTimeMillis();
+
+        produtoService.inserirProdutosEmLote(quantidade);
+
+        long fim = System.currentTimeMillis();
+
+        System.out.println("\n Produtos inseridos com sucesso!");
+        System.out.println("Tempo: " + (fim - inicio) + " ms");
     }
 
     private void calcularValorProduto() {

@@ -5,6 +5,7 @@ import exception.ProdutoNaoEncontradoException;
 import model.*;
 import validation.ProdutoValidation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoService {
@@ -158,4 +159,20 @@ public class ProdutoService {
         return produtoRepository.calcularValorProduto(id);
     }
 
+    public void inserirProdutosEmLote(int quantidade){
+
+        List<Produto> produtos =  new ArrayList<>();
+
+        for (int i = 0; i < quantidade; i++) {
+            produtos.add(
+                    new Produto(
+                            "Produto teste "+ i, +
+                                    10.0 + i, +
+                                    100,
+                                    StatusProduto.ATIVO
+                    )
+            );
+        }
+        produtoRepository.inserirProdutoEmLote(produtos);
+    }
 }

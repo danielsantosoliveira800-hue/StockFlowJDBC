@@ -516,4 +516,53 @@ public class ProdutoDAO implements ProdutoRepository {
             throw new RuntimeException( e );
         }
     }
+
+    @Override
+    public void inserirProdutoEmLote(List<Produto> produtos) {
+        String sql = """
+                    INSERT INTO produtos (nome, preco, quantidade, status)
+                    VALUES (?, ?, ?, ?)
+                    """;
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = ConnectionFactory.getConnection();
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sql);
+
+            for (Produto produto : produtos) {
+                statement.setString(1, produto.getNome());
+                statement.setDouble(2, produto.getPreco());
+                statement.setInt(3, produto.getQuantidade());
+                statement.setString(4, produto.getStatus().name());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+            connection.commit();
+
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Erro ao inserir produtos em lote.");
+
+        } finally {
+            try {
+                if (statement != null) statement.close();
+                if (connection != null) {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

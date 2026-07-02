@@ -1,6 +1,7 @@
 package dao;
 
 import db.ConnectionFactory;
+import exception.PersistenciaException;
 import model.AuditoriaProdutos;
 
 import java.sql.Connection;
@@ -40,7 +41,7 @@ public class AuditoriaProdutosDAO implements AuditoriaProdutosRepository {
 
             return auditorias;
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao listar auditorias.",e);
         }
     }
 

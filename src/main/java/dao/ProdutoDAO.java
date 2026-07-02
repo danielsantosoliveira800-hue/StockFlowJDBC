@@ -1,6 +1,7 @@
 package dao;
 
 import db.ConnectionFactory;
+import exception.PersistenciaException;
 import model.Produto;
 import model.ProdutoRanking;
 import model.ResumoEstoque;
@@ -36,7 +37,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao salvar produto.",e);
         }
     }
 
@@ -66,7 +67,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return produtos;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao listar produto.",e);
         }
     }
 
@@ -92,7 +93,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao atualizar produto.",e);
         }
     }
 
@@ -116,7 +117,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
         } catch (SQLException e) {
 
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao desativar produto.",e);
         }
     }
 
@@ -141,7 +142,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             return null;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar produto.",e);
         }
     }
 
@@ -165,7 +166,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return null;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar produto.",e);
         }
     }
 
@@ -198,7 +199,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             return produtos;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar produto por nome.",e);
         }
     }
 
@@ -220,7 +221,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao atualizar quantidade.",e);
         }
     }
 
@@ -248,7 +249,7 @@ public class ProdutoDAO implements ProdutoRepository {
             }
             return produtos;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar estoque baixo.",e);
         }
     }
 
@@ -277,7 +278,7 @@ public class ProdutoDAO implements ProdutoRepository {
             }
             return produtos;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar produtos ativos.",e);
         }
     }
 
@@ -302,7 +303,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             return 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao calcular valor do estoque.",e);
         }
     }
 
@@ -343,7 +344,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao contar produtos.",e);
         }
     }
 
@@ -370,7 +371,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao contar produtos ativos.",e);
         }
     }
 
@@ -399,7 +400,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao contar produtos inativos.",e);
         }
     }
 
@@ -426,7 +427,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao contar o total de produtos.",e);
         }
     }
 
@@ -458,7 +459,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return rankingDeProdutos;
         } catch (SQLException e) {
 
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar ranking de produtos.",e);
         }
     }
 
@@ -489,7 +490,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return null;
 
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao resumir estoque.",e);
         }
     }
 
@@ -513,7 +514,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return statement.getDouble(1);
 
         }catch (SQLException e){
-            throw new RuntimeException( e );
+            throw new PersistenciaException("Erro ao calcular valor do produto.",e);
         }
     }
 
@@ -551,7 +552,7 @@ public class ProdutoDAO implements ProdutoRepository {
                     ex.printStackTrace();
                 }
             }
-            throw new RuntimeException("Erro ao inserir produtos em lote.");
+            throw new PersistenciaException("Erro ao inserir produtos em lote.");
 
         } finally {
             try {
@@ -561,7 +562,82 @@ public class ProdutoDAO implements ProdutoRepository {
                     connection.close();
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new PersistenciaException("Erro ao inserir produto em lote.",e);
+            }
+        }
+    }
+
+    @Override
+    public void inserirProdutosComSavepoint(List<Produto> produtos) {
+
+        String sql = """
+                insert into produtos(nome, preco, quantidade, status)
+                values (?, ?, ?, ?)
+                """;
+
+        Connection connection= null;
+        PreparedStatement statement = null;
+        Savepoint savepoint = null;
+
+        try {
+
+            connection = ConnectionFactory.getConnection();
+            connection.setAutoCommit(false);
+
+            System.out.println("começando transação.");
+            statement = connection.prepareStatement(sql);
+
+            int contador = 0;
+
+            for (Produto produto : produtos) {
+
+                statement.setString(1, produto.getNome());
+                statement.setDouble(2,produto.getPreco());
+                statement.setInt(3,produto.getQuantidade());
+                statement.setString(4,produto.getStatus().name());
+
+                System.out.println("Inserindo produto: "+ produto.getNome());
+                statement.executeUpdate();
+                contador++;
+
+                if (contador == 2){
+                    savepoint =connection.setSavepoint("PONTO_SEGURO");
+                }
+
+                if (contador == 4){
+                    throw new SQLException("Erro simulado para teste");
+                }
+                
+            }
+
+            connection.commit();
+            System.out.println("Todos os produtos foram cadastrados com sucesso.");
+
+        }catch (SQLException e){
+            try {
+                if (connection !=  null && savepoint != null){
+                    connection.rollback(savepoint);
+                    System.out.println("Rolback realizado com savePoint.");
+                    connection.commit();
+                    System.out.println("commit realizado.");
+                }else {
+                    connection.rollback();
+                    System.out.println("Roolback total. ");
+                }
+            }catch (SQLException e1){
+                throw new PersistenciaException("Erro rollback com savenpoint.",e1);
+            }
+        }finally {
+            try {
+                if (statement != null){
+                    statement.close();
+                }
+                if (connection != null){
+                    connection.setAutoCommit(true);
+                    connection.close();
+                }
+            }catch (SQLException e){
+                throw new PersistenciaException("Erro ao inserir produto com savePoint.",e);
             }
         }
     }

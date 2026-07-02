@@ -1,5 +1,6 @@
 package dao;
 import db.ConnectionFactory;
+import exception.PersistenciaException;
 import model.Movimentacao;
 import model.TipoMovimentacao;
 
@@ -34,7 +35,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
             statement.executeUpdate();
 
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao registrar moovimentção.",e);
         }
     }
 
@@ -74,7 +75,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
             return movimentacoes;
 
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao listar movimentações.",e);
         }
     }
 
@@ -112,7 +113,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
 
         }catch (SQLException e){
 
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao buscar movimentação por periodo.",e);
         }
         }
 }

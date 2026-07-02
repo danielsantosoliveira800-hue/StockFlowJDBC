@@ -56,7 +56,8 @@ public class Menu {
             System.out.println("17- Auditoria.");
             System.out.println("18- Calcular Valor Total de um produto.");
             System.out.println("19- Inserir produtos em lote.");
-            System.out.println("20- Sair.");
+            System.out.println("20- Testar savepoint.");
+            System.out.println("21- Sair.");
             System.out.println(" ");
             System.out.print("Escolha uma opção: ");
             System.out.println(" ");
@@ -121,12 +122,16 @@ public class Menu {
                 case 19 ->{
                     inserirProdutosEmLote();
                 }
-                case 20->{
+                case 20 ->{
+                    produtoService.testarSavepoint();
+                    break;
+                }
+                case 21->{
                     System.out.println("Encerrando o sistema.");
                 }
                 default -> System.out.println("Opção inválida.");
             }
-        }while (opcao != 20);
+        }while (opcao != 21);
 
         sc.close();
     }

@@ -175,4 +175,25 @@ public class ProdutoService {
         }
         produtoRepository.inserirProdutoEmLote(produtos);
     }
+
+    public void inserirProdutosComSavepoint(List<Produto> produtos){
+        produtoRepository.inserirProdutosComSavepoint(produtos);
+    }
+
+    public void testarSavepoint(){
+
+        List<Produto> produtos = new ArrayList<>();
+
+        for (int i = 1; i <= 5 ; i++) {
+            produtos.add(
+                    new Produto(
+                            "produto savepoint "+ i,
+                            100 + i,
+                            10,
+                            StatusProduto.ATIVO
+                    )
+            );
+        }
+        inserirProdutosComSavepoint(produtos);
+    }
 }

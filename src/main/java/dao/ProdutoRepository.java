@@ -46,4 +46,6 @@ public interface ProdutoRepository {
     double calcularValorProduto(int id);
 
     void inserirProdutoEmLote(List<Produto> produtos);
+
+    void inserirProdutosComSavepoint(List<Produto> produtos);
 }

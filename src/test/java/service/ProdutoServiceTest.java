@@ -1,7 +1,6 @@
 package service;
 
 import dao.ProdutoRepository;
-import dao.MovimentacaoRepository;
 import exception.ProdutoNaoEncontradoException;
 import model.Produto;
 import model.StatusProduto;
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import validation.ProdutoValidation;
+import validation.ProdutoValidator;
 
 import java.util.List;
 
@@ -23,13 +22,13 @@ public class ProdutoServiceTest {
     @Mock
     private MovimentacaoService movimentacaoService;
     @Mock
-    private ProdutoValidation produtoValidation;
+    private ProdutoValidator produtoValidator;
     private ProdutoService produtoService;
 
     @BeforeEach
     void setUp(){
         MockitoAnnotations.openMocks(this);
-        produtoService = new ProdutoService(movimentacaoService, produtoRepository, produtoValidation);
+        produtoService = new ProdutoService(movimentacaoService, produtoRepository, produtoValidator);
     }
 
     @Test
@@ -50,13 +49,11 @@ public class ProdutoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar produto.")
+    @DisplayName("Deve retornar exceção quando produto não existir.")
 
-    void deveRetornarProduto(){
-        Produto produtoMock = new Produto("Fone", 75.0, 45, StatusProduto.ATIVO);
+    void deveRetonarExceptionQuandoProdutoNaoExistir(){
 
-        when(produtoRepository.buscar(999)).thenReturn(null);
-
+        when(produtoRepository.buscar(anyInt())).thenReturn(null);
 
         assertThrows(ProdutoNaoEncontradoException.class, () -> produtoService.buscarPorID(999));
 

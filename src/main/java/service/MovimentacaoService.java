@@ -5,11 +5,12 @@ import dao.MovimentacaoRepository;
 import dao.ProdutoDAO;
 import dao.ProdutoRepository;
 import db.ConnectionFactory;
+import exception.PersistenciaException;
 import exception.TipoMovimentacaoInvalidaException;
 import model.Movimentacao;
 import model.Produto;
 import model.TipoMovimentacao;
-import validation.MovimentacaoValidation;
+import validation.MovimentacaoValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -23,28 +24,28 @@ public class MovimentacaoService {
     private static final TipoMovimentacao SAIDA = TipoMovimentacao.SAIDA;
     private final MovimentacaoRepository movimentacaoRepository;
     private final ProdutoRepository produtoRepository;
-    private final MovimentacaoValidation movimentacaoValidation;
+    private final MovimentacaoValidator movimentacaoValidator;
     private final DataSource dataSource;
 
     public MovimentacaoService() {
 
-        this(new MovimentacaoDAO(),new ProdutoDAO(), new MovimentacaoValidation(), ConnectionFactory.getDataSource());
+        this(new MovimentacaoDAO(),new ProdutoDAO(), new MovimentacaoValidator(), ConnectionFactory.getDataSource());
     }
 
     public MovimentacaoService(MovimentacaoRepository movimentacaoRepository,
                                ProdutoRepository produtoRepository,
-                               MovimentacaoValidation movimentacaoValidation,
+                               MovimentacaoValidator movimentacaoValidator,
                                DataSource dataSource) {
 
         this.movimentacaoRepository = movimentacaoRepository;
         this.produtoRepository = produtoRepository;
-        this.movimentacaoValidation = movimentacaoValidation;
+        this.movimentacaoValidator = movimentacaoValidator;
         this.dataSource = dataSource;
     }
 
     public void registrarMovimentacao(Movimentacao movimentacao) {
 
-        movimentacaoValidation.validarMovimentacao(movimentacao);
+        movimentacaoValidator.validarMovimentacao(movimentacao);
 
             Connection connection = null;
             try {
@@ -62,12 +63,15 @@ public class MovimentacaoService {
 
                 commit(connection);
 
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
 
                 rollback(connection);
-                throw new RuntimeException(e);
+                throw e;
 
-            } finally {
+            }catch (SQLException e){
+                rollback(connection);
+                throw new PersistenciaException("Erro ao registrar movimentação.",e);
+            }finally {
 
                 fecharConexao(connection);
             }
@@ -81,7 +85,7 @@ public class MovimentacaoService {
             }
         }catch (SQLException e){
 
-            throw new RuntimeException(e);
+            throw new PersistenciaException("Erro ao confirmar a transação.",e);
 
         }
     }
@@ -90,7 +94,7 @@ public class MovimentacaoService {
 
         Produto produto = produtoRepository.buscar(connection, id);
 
-        movimentacaoValidation.validarProduto(produto);
+        movimentacaoValidator.validarProduto(produto);
 
         return produto;
     }
@@ -103,7 +107,7 @@ public class MovimentacaoService {
         }
 
         if (movimentacao.getTipo() == TipoMovimentacao.SAIDA){
-            movimentacaoValidation.validarSaida(produto, movimentacao);
+            movimentacaoValidator.validarSaida(produto, movimentacao);
 
             return quantidadeAtual - movimentacao.getQuantidade();
         }
@@ -117,7 +121,7 @@ public class MovimentacaoService {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao executar o rollback.");
+            throw new PersistenciaException("Erro ao executar o rollback.",e);
         }
     }
 
@@ -127,7 +131,7 @@ public class MovimentacaoService {
                 connection.close();
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao fechar o banco.");
+            throw new PersistenciaException("Erro ao fechar a conexão com o banco de dados.",e);
         }
     }
 

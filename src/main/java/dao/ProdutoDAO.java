@@ -534,10 +534,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement = connection.prepareStatement(sql);
 
             for (Produto produto : produtos) {
-                statement.setString(1, produto.getNome());
-                statement.setDouble(2, produto.getPreco());
-                statement.setInt(3, produto.getQuantidade());
-                statement.setString(4, produto.getStatus().name());
+                preencherStatement(statement,produto);
                 statement.addBatch();
             }
 
@@ -549,10 +546,10 @@ public class ProdutoDAO implements ProdutoRepository {
                 try {
                     connection.rollback();
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    throw new PersistenciaException("Erro ao executar rollback do lote.",e);
                 }
             }
-            throw new PersistenciaException("Erro ao inserir produtos em lote.");
+            throw new PersistenciaException("Erro ao inserir produtos em lote.",e);
 
         } finally {
             try {
@@ -591,10 +588,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             for (Produto produto : produtos) {
 
-                statement.setString(1, produto.getNome());
-                statement.setDouble(2,produto.getPreco());
-                statement.setInt(3,produto.getQuantidade());
-                statement.setString(4,produto.getStatus().name());
+                preencherStatement(statement,produto);
 
                 System.out.println("Inserindo produto: "+ produto.getNome());
                 statement.executeUpdate();
@@ -640,5 +634,14 @@ public class ProdutoDAO implements ProdutoRepository {
                 throw new PersistenciaException("Erro ao inserir produto com savePoint.",e);
             }
         }
+    }
+
+    private void preencherStatement(PreparedStatement statement, Produto produto) throws SQLException {
+
+        statement.setString(1, produto.getNome());
+        statement.setDouble(2,produto.getPreco());
+        statement.setInt(3,produto.getQuantidade());
+        statement.setString(4,produto.getStatus().name());
+
     }
 }

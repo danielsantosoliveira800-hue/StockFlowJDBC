@@ -35,7 +35,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
             statement.executeUpdate();
 
         }catch (SQLException e){
-            throw new PersistenciaException("Erro ao registrar moovimentção.",e);
+            throw new PersistenciaException("Erro ao registrar movimentação.",e);
         }
     }
 
@@ -102,13 +102,13 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
 
             try (ResultSet resultSet = statement.executeQuery()){
 
-                List<Movimentacao> listaPorDatas = new ArrayList<>();
+                List<Movimentacao> Movimentacoes = new ArrayList<>();
 
                 while (resultSet.next()){
-                    listaPorDatas.add(mapearMovimentacao(resultSet));
+                    Movimentacoes.add(mapearMovimentacao(resultSet));
                 }
 
-                return listaPorDatas;
+                return Movimentacoes;
             }
 
         }catch (SQLException e){

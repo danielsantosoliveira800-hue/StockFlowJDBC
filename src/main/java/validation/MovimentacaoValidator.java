@@ -3,11 +3,12 @@ package validation;
 import exception.EstoqueInsuficienteException;
 import exception.ProdutoNaoEncontradoException;
 import exception.TipoMovimentacaoInvalidaException;
+import exception.ValidacaoException;
 import model.Movimentacao;
 import model.Produto;
 import model.TipoMovimentacao;
 
-public class MovimentacaoValidation {
+public class MovimentacaoValidator {
 
     public void validarProduto(Produto produto){
 
@@ -33,15 +34,15 @@ public class MovimentacaoValidation {
         }
 
         if (movimentacao.getProduto_id() <= 0){
-            throw new IllegalArgumentException("Produto inválido.");
+            throw new ValidacaoException("Produto inválido.");
         }
 
         if (movimentacao.getQuantidade() <= 0){
-            throw new IllegalArgumentException("Quantidade inválida.");
+            throw new ValidacaoException("Quantidade inválida.");
         }
 
         if (movimentacao.getTipo() == null){
-            throw new IllegalArgumentException("Tipo de movimentação inválido.");
+            throw new ValidacaoException("Tipo de movimentação inválido.");
         }
     }
 }

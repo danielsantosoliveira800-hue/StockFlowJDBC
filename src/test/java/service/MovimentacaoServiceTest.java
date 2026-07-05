@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import validation.MovimentacaoValidation;
+import validation.MovimentacaoValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -30,7 +30,7 @@ public class MovimentacaoServiceTest {
     @Mock
     private ProdutoRepository produtoRepository;
     @Mock
-    private MovimentacaoValidation movimentacaoValidation;
+    private MovimentacaoValidator movimentacaoValidator;
     @Mock
     private DataSource dataSource;
     @Mock
@@ -43,7 +43,7 @@ public class MovimentacaoServiceTest {
         movimentacaoService = new MovimentacaoService(
                 movimentacaoRepository,
                 produtoRepository,
-                movimentacaoValidation,
+                movimentacaoValidator,
                 dataSource
         );
     }
@@ -64,7 +64,7 @@ public class MovimentacaoServiceTest {
         when(dataSource.getConnection()).thenReturn(connectionMock);
 
         doThrow(new EstoqueInsuficienteException())
-                .when(movimentacaoValidation)
+                .when(movimentacaoValidator)
                 .validarSaida(produto, movimentacao);
 
         assertThrows(RuntimeException.class,
@@ -91,5 +91,57 @@ public class MovimentacaoServiceTest {
         assertThrows(RuntimeException.class, () -> {
             movimentacaoService.registrarMovimentacao(movimentacaoMock);
         });
+    }
+
+    @Test
+    @DisplayName("Deve regstrar entrada de estoque com sucesso.")
+    void deveResgistrarEntradaDeEstoqueComSucesso() throws SQLException {
+        Produto produto = new Produto(
+                "Teclado",
+                120.0,
+                40,
+                StatusProduto.ATIVO
+        );
+        produto.setId(1);
+
+        Movimentacao movimentacao = new Movimentacao(1, TipoMovimentacao.ENTRADA, 5);
+
+        Connection connectionMock = mock(Connection.class);
+
+        when(dataSource.getConnection()).thenReturn(connectionMock);
+
+        when(produtoRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
+
+        movimentacaoService.registrarMovimentacao(movimentacao);
+
+        verify(produtoRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(45));
+
+        verify(movimentacaoRepository).registrarMovimentacao(any(Connection.class),eq(movimentacao));
+    }
+
+    @Test
+    @DisplayName("Deve regstrar saida de estoque com sucesso.")
+    void deveResgistrarSaidaDeEstoqueComSucesso() throws SQLException {
+        Produto produto = new Produto(
+                "Teclado",
+                120.0,
+                40,
+                StatusProduto.ATIVO
+        );
+        produto.setId(1);
+
+        Movimentacao movimentacao = new Movimentacao(1, TipoMovimentacao.SAIDA, 5);
+
+        Connection connectionMock = mock(Connection.class);
+
+        when(dataSource.getConnection()).thenReturn(connectionMock);
+
+        when(produtoRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
+
+        movimentacaoService.registrarMovimentacao(movimentacao);
+
+        verify(produtoRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(35));
+
+        verify(movimentacaoRepository).registrarMovimentacao(any(Connection.class),eq(movimentacao));
     }
 }

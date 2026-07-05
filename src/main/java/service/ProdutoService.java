@@ -2,8 +2,9 @@ package service;
 import dao.ProdutoDAO;
 import dao.ProdutoRepository;
 import exception.ProdutoNaoEncontradoException;
+import exception.ValidacaoException;
 import model.*;
-import validation.ProdutoValidation;
+import validation.ProdutoValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,24 +12,24 @@ import java.util.List;
 public class ProdutoService {
 
     private final MovimentacaoService movimentacaoService;
-    private final ProdutoValidation produtoValidation;
+    private final ProdutoValidator produtoValidator;
     private final ProdutoRepository produtoRepository;
 
     public ProdutoService() {
-        this(new MovimentacaoService(), new ProdutoDAO(), new ProdutoValidation());
+        this(new MovimentacaoService(), new ProdutoDAO(), new ProdutoValidator());
     }
 
     public ProdutoService(MovimentacaoService movimentacaoService,
                           ProdutoRepository produtoRepository,
-                          ProdutoValidation produtoValidation)
+                          ProdutoValidator produtoValidator)
     {
         this.movimentacaoService = movimentacaoService;
         this.produtoRepository = produtoRepository;
-        this.produtoValidation = produtoValidation;
+        this.produtoValidator = produtoValidator;
     }
 
     public void cadastrarProduto(Produto produto){
-        produtoValidation.validarProduto(produto);
+        produtoValidator.validarProduto(produto);
         produtoRepository.salvarProduto(produto);
     }
 
@@ -38,7 +39,7 @@ public class ProdutoService {
 
     public void atualizarPreco(int id, double novoPreco){
 
-        produtoValidation.atualizarPreco(novoPreco);
+        produtoValidator.atualizarPreco(novoPreco);
 
         Produto produto = buscarProduto(id);
 
@@ -58,7 +59,7 @@ public class ProdutoService {
 
     public List<Produto> buscarPorNome(String nome) {
 
-        produtoValidation.validarNome(nome);
+        produtoValidator.validarNome(nome);
 
         return produtoRepository.buscarPorNome(nome);
     }
@@ -68,7 +69,7 @@ public class ProdutoService {
 
         Produto produto =  buscarProduto(id);
 
-        validarQuantidade(quantidadeEntrada);
+        produtoValidator.validarQuantidade(quantidadeEntrada);
 
         registrarMovimentacao(produto.getId(), quantidadeEntrada, TipoMovimentacao.ENTRADA);
 
@@ -78,7 +79,7 @@ public class ProdutoService {
 
         Produto produto = buscarProduto(id);
 
-        validarQuantidade(quantidadeSaida);
+        produtoValidator.validarQuantidade(quantidadeSaida);
 
         registrarMovimentacao(produto.getId(), quantidadeSaida, TipoMovimentacao.SAIDA);
     }
@@ -118,7 +119,7 @@ public class ProdutoService {
     private Produto buscarProduto(int id){
 
         if (id <= 0){
-            throw new IllegalArgumentException("ID inválido.");
+            throw new ValidacaoException("ID inválido.");
         }
 
         Produto produto = produtoRepository.buscar(id);
@@ -141,12 +142,6 @@ public class ProdutoService {
         movimentacaoService.registrarMovimentacao(movimentacao);
     }
 
-    private void validarQuantidade(int quantidade){
-
-        if (quantidade <= 0){
-            throw new IllegalArgumentException("Quantidade inválida.");
-        }
-    }
 
     public ResumoEstoque buscarResumoEstoque(){
         return produtoRepository.buscarResumoEstoque();

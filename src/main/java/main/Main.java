@@ -3,33 +3,29 @@ package main;
 import dao.MovimentacaoDAO;
 import dao.ProdutoDAO;
 import db.ConnectionFactory;
-import model.Movimentacao;
-import model.Produto;
 import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;
 import ui.Menu;
-import validation.MovimentacaoValidation;
-import validation.ProdutoValidation;
-
-import java.sql.Connection;
+import validation.MovimentacaoValidator;
+import validation.ProdutoValidator;
 
 public class Main {
     public static void main(String[] args) {
         ProdutoDAO produtoDAO = new ProdutoDAO();
         MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
-        MovimentacaoValidation movimentacaoValidation =  new MovimentacaoValidation();
+        MovimentacaoValidator movimentacaoValidator =  new MovimentacaoValidator();
         AuditoriaProdutoService auditoriaProdutoService = new AuditoriaProdutoService();
 
         MovimentacaoService movimentacaoService = new MovimentacaoService
                                                         (movimentacaoDAO,
                                                         produtoDAO,
-                                                        movimentacaoValidation,
+                                                                movimentacaoValidator,
                                                         ConnectionFactory.getDataSource());
 
-        ProdutoValidation produtoValidation = new ProdutoValidation();
+        ProdutoValidator produtoValidator = new ProdutoValidator();
 
-        ProdutoService produtoService = new ProdutoService(movimentacaoService, produtoDAO, produtoValidation);
+        ProdutoService produtoService = new ProdutoService(movimentacaoService, produtoDAO, produtoValidator);
 
         Menu menu = new Menu(produtoService, movimentacaoService, auditoriaProdutoService);
 

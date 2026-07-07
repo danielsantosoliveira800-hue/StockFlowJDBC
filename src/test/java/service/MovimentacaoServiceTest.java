@@ -69,6 +69,12 @@ public class MovimentacaoServiceTest {
 
         assertThrows(RuntimeException.class,
                 () -> { movimentacaoService.registrarMovimentacao(movimentacao);});
+
+        verify(connectionMock).rollback();
+
+        verify(connectionMock, never()).commit();
+
+        verify(connectionMock).close();
     }
 
     @Test
@@ -117,6 +123,8 @@ public class MovimentacaoServiceTest {
         verify(produtoRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(45));
 
         verify(movimentacaoRepository).registrarMovimentacao(any(Connection.class),eq(movimentacao));
+
+        verify(connectionMock).commit();
     }
 
     @Test
@@ -143,5 +151,7 @@ public class MovimentacaoServiceTest {
         verify(produtoRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(35));
 
         verify(movimentacaoRepository).registrarMovimentacao(any(Connection.class),eq(movimentacao));
+
+        verify(connectionMock).commit();
     }
 }

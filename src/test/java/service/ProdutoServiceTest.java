@@ -58,4 +58,32 @@ public class ProdutoServiceTest {
         assertThrows(ProdutoNaoEncontradoException.class, () -> produtoService.buscarPorID(999));
 
     }
+
+    @Test
+    @DisplayName("Deve cadastrar produto com sucesso.")
+    void deveRetornarProdutoCadastrado(){
+
+        Produto produto = new Produto("Hadset", 230.0, 20, StatusProduto.ATIVO);
+
+        produtoService.cadastrarProduto(produto);
+
+        verify(produtoValidator).validarProduto(produto);
+        verify(produtoRepository).salvarProduto(produto);
+
+    }
+
+    @Test
+    @DisplayName("Deve reotornar produto em busca por nome.")
+    void deveRetornarProdutoEmBuscaPorNome(){
+        List<Produto> produtos = List.of(new Produto("mouse", 45.0, 70, StatusProduto.ATIVO));
+        when(produtoRepository.buscarPorNome("mouse")).thenReturn(produtos);
+
+        List<Produto> resultado = produtoService.buscarPorNome("mouse");
+
+        verify(produtoValidator).validarNome("mouse");
+        verify(produtoRepository).buscarPorNome("mouse");
+
+        assertEquals(1, resultado.size());
+        assertEquals("mouse", resultado.get(0).getNome());
+    }
 }

@@ -3,13 +3,11 @@ package service;
 import dao.ProdutoRepository;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
-import model.Movimentacao;
-import model.Produto;
-import model.ProdutoRanking;
-import model.StatusProduto;
+import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import validation.ProdutoValidator;
@@ -33,6 +31,28 @@ public class ProdutoServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         produtoService = new ProdutoService(movimentacaoService, produtoRepository, produtoValidator);
+    }
+
+    @Test
+    @DisplayName("Deve retornar o resumo do estoque.")
+    void deveRetornarResumoDoEstoque(){
+        ResumoEstoque resumoMock = new ResumoEstoque();
+        resumoMock.setProdutosInativos(30);
+        resumoMock.setProdutosAtivos(970);
+        resumoMock.setTotalProdutos(1000);
+        resumoMock.setQuantidadeTotalProdutos(3056);
+        resumoMock.setValorTotalEstoque(860996.00);
+
+        when(produtoRepository.buscarResumoEstoque()).thenReturn(resumoMock);
+
+        ResumoEstoque resultado = produtoService.buscarResumoEstoque();
+
+        // confira pelo menos 1 ou 2 campos com assertEquals
+        // e faça o verify no repository
+
+        assertEquals(30, resultado.getProdutosInativos());
+        assertEquals(970, resultado.getProdutosAtivos());
+        verify(produtoRepository).buscarResumoEstoque();
     }
 
     @Test
@@ -265,5 +285,30 @@ public class ProdutoServiceTest {
 
         assertEquals(10, total);
         verify(produtoRepository).quantidadeTotalProdutos();
+    }
+
+    @Test
+    @DisplayName("Deve inserir produtos em lote com a quantidade correta.")
+    void inseriProdutosEmLoteComQuantidadeCorreta(){
+        ArgumentCaptor<List<Produto>> captor = ArgumentCaptor.forClass(List.class);
+
+        produtoService.inserirProdutosEmLote(200);
+        verify(produtoRepository).inserirProdutoEmLote(captor.capture());
+
+        List<Produto> produtosCapturados = captor.getValue();
+
+        assertEquals(200, produtosCapturados.size());
+
+    }
+
+    @Test
+    @DisplayName("Deve inserir produtos com savepoint.")
+    void inserirProdutosComSavepoint(){
+        List<Produto> produtos = List.of(
+                new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
+        );
+
+        produtoService.inserirProdutosComSavepoint(produtos);
+        verify(produtoRepository).inserirProdutosComSavepoint(produtos);
     }
 }

@@ -161,10 +161,10 @@ public class ProdutoService {
         for (int i = 0; i < quantidade; i++) {
             produtos.add(
                     new Produto(
-                            "Produto teste "+ i, +
-                                    10.0 + i, +
-                                    100,
-                                    StatusProduto.ATIVO
+                            "Produto teste "+ i,
+                            10.0 + i,
+                            100,
+                            StatusProduto.ATIVO
                     )
             );
         }

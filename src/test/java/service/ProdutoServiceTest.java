@@ -5,6 +5,7 @@ import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
 import model.Movimentacao;
 import model.Produto;
+import model.ProdutoRanking;
 import model.StatusProduto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import validation.ProdutoValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,6 +49,54 @@ public class ProdutoServiceTest {
         assertEquals(1, resultado.size());
         assertEquals("Teclado", resultado.get(0).getNome());
         verify(produtoRepository).listar();
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma lista de produtos com estoque baixo. ")
+    void retornaListaDeProdutosComEstoeueBaixo(){
+        List<Produto> estoqueBaixoMock = List.of(
+                new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
+        );
+
+        when(produtoRepository.buscarEstoqueBaixo()).thenReturn(estoqueBaixoMock);
+
+        List<Produto> resultado = produtoService.buscarEstoqueBaixo();
+
+        assertEquals(1, resultado.size());
+        assertEquals("Teclado", resultado.get(0).getNome());
+        verify(produtoRepository).buscarEstoqueBaixo();
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma lista de produtos com estoque ativo.")
+    void retornaListaDeProdutosAtivos(){
+        List<Produto> produtosAtivos = List.of(
+                new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
+        );
+
+        when(produtoRepository.buscarProdutosAtivos()).thenReturn(produtosAtivos);
+
+        List<Produto> resultado = produtoService.buscarEstoqueAtivo();
+
+        assertEquals(1, resultado.size());
+        assertEquals("Teclado", resultado.get(0).getNome());
+        verify(produtoRepository).buscarProdutosAtivos();
+    }
+
+    @Test
+    @DisplayName("Deve retoenar um ranking de produtos.")
+    void retornaRankingdeProdutos(){
+        List<ProdutoRanking> rankingMock = List.of(
+                new ProdutoRanking("Teclado", 12, 340)
+        );
+
+        when(produtoRepository.buscarRankingProdutos()).thenReturn(rankingMock);
+
+        List<ProdutoRanking> resultado = produtoService.buscarProdutoRanking();
+
+        assertEquals(1, resultado.size());
+        assertEquals("Teclado", resultado.get(0).getNomeProduto());
+        verify(produtoRepository).buscarRankingProdutos();
     }
 
     @Test
@@ -161,6 +211,33 @@ public class ProdutoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve retornar o valor total em estoque.")
+    void retornaOValorTotalNoEstoque(){
+        when(produtoRepository.calcularValorTotalEstoque()).thenReturn(10.0);
+
+        double total = produtoService.calcularValorTotalEstoque();
+
+        assertEquals(10.0, total);
+        verify(produtoRepository).calcularValorTotalEstoque();
+    }
+
+
+    @Test
+    @DisplayName("Deve retornar o valor total de um certo produto no estoque.")
+    void retornaOValorTotalDeUmProdutoNoEstoque(){
+        Produto produto = new Produto("Fone", 70.00, 120, StatusProduto.ATIVO);
+        produto.setId(1);
+        when(produtoRepository.buscar(1)).thenReturn(produto);
+        when(produtoRepository.calcularValorProduto(1)).thenReturn(10.0);
+
+        double total = produtoService.calcularValorProduto(1);
+
+        assertEquals(10.0, total);
+        verify(produtoRepository).buscar(1);
+        verify(produtoRepository).calcularValorProduto(1);
+    }
+
+    @Test
     @DisplayName("Deve retornar a quantidade total de produtos ativos.")
     void deveRetornarQuantidadeTotalDeProdutosAtivos() {
         when(produtoRepository.contaProdutosAtivos()).thenReturn(10);
@@ -168,5 +245,25 @@ public class ProdutoServiceTest {
 
         assertEquals(10, total);
         verify(produtoRepository).contaProdutosAtivos();
+    }
+
+    @Test
+    @DisplayName("Deve retornar a quantidade total de produtos inativos.")
+    void deveRetornarQuantidadeTotalDeProdutosInativos(){
+        when(produtoRepository.contaProdutosInativos()).thenReturn(10);
+        int total =  produtoService.contaProdutosInativos();
+
+        assertEquals(10, total);
+        verify(produtoRepository).contaProdutosInativos();
+    }
+
+    @Test
+    @DisplayName("Deve retornar a soma total das quantidades de produtos.")
+    void deveRetornarASomaTotalDeProdutos(){
+        when(produtoRepository.quantidadeTotalProdutos()).thenReturn(10);
+        int total = produtoService.somaQuantidadeProdutos();
+
+        assertEquals(10, total);
+        verify(produtoRepository).quantidadeTotalProdutos();
     }
 }

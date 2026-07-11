@@ -6,6 +6,7 @@ public class Produto {
     private double preco;
     private int quantidade;
     private StatusProduto status;
+    private boolean desativadoManualmente;
 
     public Produto(){
 
@@ -61,6 +62,14 @@ public class Produto {
 
     public void setStatus(StatusProduto status) {
         this.status = status;
+    }
+
+    public boolean isDesativadoManualmente() {
+        return desativadoManualmente;
+    }
+
+    public void setDesativadoManualmente(boolean desativadoManualmente) {
+        this.desativadoManualmente = desativadoManualmente;
     }
 
 }

@@ -9,6 +9,7 @@ import exception.PersistenciaException;
 import exception.TipoMovimentacaoInvalidaException;
 import model.Movimentacao;
 import model.Produto;
+import model.StatusProduto;
 import model.TipoMovimentacao;
 import validation.MovimentacaoValidator;
 
@@ -58,6 +59,13 @@ public class MovimentacaoService {
                 int novaQuantidade = calcularNovaQuantidade(produto,movimentacao);
 
                 produtoRepository.atualizarQuantidade(connection, produto.getId(), novaQuantidade);
+
+                if (!produto.isDesativadoManualmente()){
+                    StatusProduto novoStatus =
+                            novaQuantidade == 0 ? StatusProduto.INATIVO : StatusProduto.ATIVO;
+
+                    produtoRepository.atualizarStatus(connection, produto.getId(), novoStatus);
+                }
 
                 movimentacaoRepository.registrarMovimentacao(connection, movimentacao);
 

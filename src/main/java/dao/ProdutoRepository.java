@@ -3,6 +3,7 @@ package dao;
 import model.Produto;
 import model.ProdutoRanking;
 import model.ResumoEstoque;
+import model.StatusProduto;
 
 import java.sql.Connection;
 import java.util.List;
@@ -48,4 +49,8 @@ public interface ProdutoRepository {
     void inserirProdutoEmLote(List<Produto> produtos);
 
     void inserirProdutosComSavepoint(List<Produto> produtos);
+
+    void reativar(int id);
+
+    void atualizarStatus(Connection connection, int id, StatusProduto status);
 }

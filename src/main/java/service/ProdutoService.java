@@ -30,6 +30,12 @@ public class ProdutoService {
 
     public void cadastrarProduto(Produto produto){
         produtoValidator.validarProduto(produto);
+
+        StatusProduto statusInicial =
+                produto.getQuantidade() == 0 ? StatusProduto.INATIVO : StatusProduto.ATIVO;
+
+        produto.setStatus(statusInicial);
+
         produtoRepository.salvarProduto(produto);
     }
 
@@ -190,5 +196,10 @@ public class ProdutoService {
             );
         }
         inserirProdutosComSavepoint(produtos);
+    }
+
+    public void reativar(int id){
+        Produto produto =  buscarProduto(id);
+        produtoRepository.reativar(produto.getId());
     }
 }

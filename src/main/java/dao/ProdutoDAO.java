@@ -18,8 +18,8 @@ public class ProdutoDAO implements ProdutoRepository {
 
         String sql =
                 "INSERT INTO produtos " +
-                        "(nome, preco, quantidade, status) " +
-                        "VALUES (?, ?, ?, ?)";
+                        "(nome, preco, quantidade, status, desativado_manualmente) " +
+                        "VALUES (?, ?, ?, ?, ?)";
 
         try (
                 Connection connection =
@@ -33,6 +33,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.setDouble(2, produto.getPreco());
             statement.setInt(3, produto.getQuantidade());
             statement.setString(4, produto.getStatus().name());
+            statement.setBoolean(5, produto.isDesativadoManualmente());
 
             statement.executeUpdate();
 
@@ -100,8 +101,8 @@ public class ProdutoDAO implements ProdutoRepository {
     @Override
     public void desativar(int id) {
 
-        String sql = "UPDATE produtos"+
-                     "SET status = 'INATIVO' "+
+        String sql = "UPDATE produtos " +
+                     "SET status = 'INATIVO', desativado_manualmente = TRUE " +
                      "WHERE id = ?";
 
         try (
@@ -316,7 +317,7 @@ public class ProdutoDAO implements ProdutoRepository {
         produto.setPreco(rs.getDouble("preco"));
         produto.setQuantidade(rs.getInt("quantidade"));
         produto.setStatus(StatusProduto.valueOf(rs.getString("status")));
-
+        produto.setDesativadoManualmente(rs.getBoolean("desativado_manualmente"));
 
         return produto;
     }
@@ -521,8 +522,8 @@ public class ProdutoDAO implements ProdutoRepository {
     @Override
     public void inserirProdutoEmLote(List<Produto> produtos) {
         String sql = """
-                    INSERT INTO produtos (nome, preco, quantidade, status)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO produtos (nome, preco, quantidade, status, desativado_manualmente)
+                    VALUES (?, ?, ?, ?, ?)
                     """;
 
         Connection connection = null;
@@ -568,8 +569,8 @@ public class ProdutoDAO implements ProdutoRepository {
     public void inserirProdutosComSavepoint(List<Produto> produtos) {
 
         String sql = """
-                insert into produtos(nome, preco, quantidade, status)
-                values (?, ?, ?, ?)
+                insert into produtos(nome, preco, quantidade, status, desativado_manualmente)
+                values (?, ?, ?, ?, ?)
                 """;
 
         Connection connection= null;
@@ -636,12 +637,60 @@ public class ProdutoDAO implements ProdutoRepository {
         }
     }
 
+    @Override
+    public void reativar(int id) {
+        String sql = """
+                UPDATE produtos
+                SET status = 'ATIVO', desativado_manualmente = FALSE 
+                WHERE id = ?
+                """;
+        try (
+                Connection connection =
+                        ConnectionFactory.getConnection();
+
+                PreparedStatement statement =
+                        connection.prepareStatement(sql);
+        ) {
+            statement.setInt(1, id);
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new PersistenciaException("Erro ao reativar produto.",e);
+        }
+    }
+
+    @Override
+    public void atualizarStatus(Connection connection, int id, StatusProduto status) {
+        String sql = """
+                UPDATE produtos 
+                SET status = ? 
+                WHERE id = ?
+                """;
+
+        try (
+                PreparedStatement statement =
+                        connection.prepareStatement(sql);
+        ) {
+            statement.setString(1, status.name());
+
+            statement.setInt(2, id);
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenciaException("Erro ao atualizar status.",e);
+        }
+    }
+
     private void preencherStatement(PreparedStatement statement, Produto produto) throws SQLException {
 
         statement.setString(1, produto.getNome());
         statement.setDouble(2,produto.getPreco());
         statement.setInt(3,produto.getQuantidade());
         statement.setString(4,produto.getStatus().name());
+        statement.setBoolean(5, produto.isDesativadoManualmente());
 
     }
 }

@@ -42,4 +42,27 @@ class ProdutoDAOTest extends IntegrationTestBase {
 
         assertEquals(2, produtos.size());
     }
+
+    @Test
+    void deveAtualizarPrecoDoProduto(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+
+        produtoDAO.atualizar(1, 750.0);
+
+        Produto produtoAtualizado = produtoDAO.buscar(1);
+
+        assertEquals("Monitor", produtoAtualizado.getNome());
+        assertEquals(750.0, produtoAtualizado.getPreco());
+
+    }
+
+    @Test
+    void deveDesativarProduto(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+
+        produtoDAO.desativar(1);
+
+        Produto produtoResultado = produtoDAO.buscar(1);
+        assertEquals(StatusProduto.INATIVO , produtoResultado.getStatus());
+    }
 }

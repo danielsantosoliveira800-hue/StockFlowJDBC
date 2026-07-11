@@ -35,7 +35,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar o resumo do estoque.")
-    void deveRetornarResumoDoEstoque(){
+    void deveRetornarResumoDoEstoque() {
         ResumoEstoque resumoMock = new ResumoEstoque();
         resumoMock.setProdutosInativos(30);
         resumoMock.setProdutosAtivos(970);
@@ -73,7 +73,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar uma lista de produtos com estoque baixo. ")
-    void retornaListaDeProdutosComEstoeueBaixo(){
+    void retornaListaDeProdutosComEstoeueBaixo() {
         List<Produto> estoqueBaixoMock = List.of(
                 new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
         );
@@ -89,7 +89,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar uma lista de produtos com estoque ativo.")
-    void retornaListaDeProdutosAtivos(){
+    void retornaListaDeProdutosAtivos() {
         List<Produto> produtosAtivos = List.of(
                 new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
         );
@@ -105,7 +105,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retoenar um ranking de produtos.")
-    void retornaRankingdeProdutos(){
+    void retornaRankingdeProdutos() {
         List<ProdutoRanking> rankingMock = List.of(
                 new ProdutoRanking("Teclado", 12, 340)
         );
@@ -135,7 +135,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve desativar produto com sucesso.")
-    void deveRetornarProdutoComSucesso() {
+    void deveRetornarProdutoDesativadoComSucesso() {
         Produto produto = new Produto("Mouse", 40.0, 150, StatusProduto.ATIVO);
         produto.setId(1);
         when(produtoRepository.buscar(1)).thenReturn(produto);
@@ -232,7 +232,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar o valor total em estoque.")
-    void retornaOValorTotalNoEstoque(){
+    void retornaOValorTotalNoEstoque() {
         when(produtoRepository.calcularValorTotalEstoque()).thenReturn(10.0);
 
         double total = produtoService.calcularValorTotalEstoque();
@@ -244,7 +244,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar o valor total de um certo produto no estoque.")
-    void retornaOValorTotalDeUmProdutoNoEstoque(){
+    void retornaOValorTotalDeUmProdutoNoEstoque() {
         Produto produto = new Produto("Fone", 70.00, 120, StatusProduto.ATIVO);
         produto.setId(1);
         when(produtoRepository.buscar(1)).thenReturn(produto);
@@ -269,9 +269,9 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar a quantidade total de produtos inativos.")
-    void deveRetornarQuantidadeTotalDeProdutosInativos(){
+    void deveRetornarQuantidadeTotalDeProdutosInativos() {
         when(produtoRepository.contaProdutosInativos()).thenReturn(10);
-        int total =  produtoService.contaProdutosInativos();
+        int total = produtoService.contaProdutosInativos();
 
         assertEquals(10, total);
         verify(produtoRepository).contaProdutosInativos();
@@ -279,7 +279,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve retornar a soma total das quantidades de produtos.")
-    void deveRetornarASomaTotalDeProdutos(){
+    void deveRetornarASomaTotalDeProdutos() {
         when(produtoRepository.quantidadeTotalProdutos()).thenReturn(10);
         int total = produtoService.somaQuantidadeProdutos();
 
@@ -289,7 +289,7 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve inserir produtos em lote com a quantidade correta.")
-    void inseriProdutosEmLoteComQuantidadeCorreta(){
+    void inseriProdutosEmLoteComQuantidadeCorreta() {
         ArgumentCaptor<List<Produto>> captor = ArgumentCaptor.forClass(List.class);
 
         produtoService.inserirProdutosEmLote(200);
@@ -303,12 +303,48 @@ public class ProdutoServiceTest {
 
     @Test
     @DisplayName("Deve inserir produtos com savepoint.")
-    void inserirProdutosComSavepoint(){
+    void inserirProdutosComSavepoint() {
         List<Produto> produtos = List.of(
                 new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
         );
 
         produtoService.inserirProdutosComSavepoint(produtos);
         verify(produtoRepository).inserirProdutosComSavepoint(produtos);
+    }
+
+    @Test
+    @DisplayName("Deve definir status INATIVO ao cadastrar produto com quantidade zero.")
+    void deveDefinirStatusInativoQuandoQuantidadeForZero() {
+        Produto produto = new Produto("Monitor", 900.0, 0, StatusProduto.ATIVO);
+
+        produtoService.cadastrarProduto(produto);
+
+        assertEquals(StatusProduto.INATIVO, produto.getStatus());
+        verify(produtoRepository).salvarProduto(produto);
+    }
+
+
+    @Test
+    @DisplayName("Deve definir status ATIVO ao cadastrar produto com quantidade positiva.")
+    void deveDefinirStatusAtivoQuandoQuantidadeForPositiva() {
+        Produto produto = new Produto("Monitor", 900.0, 20, StatusProduto.INATIVO);
+
+        produtoService.cadastrarProduto(produto);
+
+        assertEquals(StatusProduto.ATIVO, produto.getStatus());
+        verify(produtoRepository).salvarProduto(produto);
+    }
+
+    @Test
+    @DisplayName("Deve reativar produto com sucesso.")
+    void deveReativarProdutoComSucesso(){
+        Produto produto = new Produto("Mouse", 40.0, 150, StatusProduto.INATIVO);
+        produto.setId(1);
+        when(produtoRepository.buscar(1)).thenReturn(produto);
+
+        produtoService.reativar(1);
+
+        verify(produtoRepository).buscar(1);
+        verify(produtoRepository).reativar(1);
     }
 }

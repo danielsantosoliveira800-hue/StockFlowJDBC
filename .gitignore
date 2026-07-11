@@ -29,6 +29,7 @@ bin/
 
 ### Configurações locais ###
 config.properties
+config-test.properties
 
 ### Maven ###
 target/

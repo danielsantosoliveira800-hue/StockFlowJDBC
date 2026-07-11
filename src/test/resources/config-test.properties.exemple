@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/stockflow_test
+db.user=root
+db.password=sua_senha_aqui

@@ -12,11 +12,13 @@ import java.util.Properties;
 public class ConnectionFactory {
 
     private static final HikariDataSource dataSource;
+    private static final String CONFIG_FILE =
+            System.getProperty("config.file","config.properties");
 
     static {
         try (var input = ConnectionFactory.class
                 .getClassLoader()
-                .getResourceAsStream("config.properties")) {
+                .getResourceAsStream(CONFIG_FILE)) {
 
             if (input == null) {
                 throw new RuntimeException("Arquivo config.properties não encontrado.");

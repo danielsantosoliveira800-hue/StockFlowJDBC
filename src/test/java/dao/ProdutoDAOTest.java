@@ -1,11 +1,12 @@
 package dao;
 
+import db.ConnectionFactory;
 import integration.IntegrationTestBase;
-import model.Produto;
-import model.ResumoEstoque;
-import model.StatusProduto;
+import model.*;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -157,5 +158,27 @@ class ProdutoDAOTest extends IntegrationTestBase {
         assertEquals(10300.0, resumo.getValorTotalEstoque());
         assertEquals(2, resumo.getProdutosAtivos());
         assertEquals(1, resumo.getProdutosInativos());
+    }
+
+    @Test
+    void deveBuscarRankingDeProdutos() throws SQLException {
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+
+        MovimentacaoDAO movimentacaoDAO =  new MovimentacaoDAO();
+
+        try (Connection connection =  ConnectionFactory.getConnection()){
+            movimentacaoDAO.registrarMovimentacao(connection, new Movimentacao(1, TipoMovimentacao.ENTRADA, 10));
+            movimentacaoDAO.registrarMovimentacao(connection, new Movimentacao(1, TipoMovimentacao.SAIDA, 3));
+            movimentacaoDAO.registrarMovimentacao(connection, new Movimentacao(2, TipoMovimentacao.SAIDA, 5));
+        }
+
+        List<ProdutoRanking> ranking = produtoDAO.buscarRankingProdutos();
+
+        assertEquals(2, ranking.size());
+        assertEquals("Monitor", ranking.get(0).getNomeProduto());
+        assertEquals(2, ranking.get(0).getTotalMovimentacoes());
+        assertEquals(13, ranking.get(0).getQuantidadeMovimentada());
+
     }
 }

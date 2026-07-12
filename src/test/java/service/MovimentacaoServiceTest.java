@@ -50,7 +50,6 @@ public class MovimentacaoServiceTest {
 
     @Test
     @DisplayName("Deve lançar exception quando estoque estiver insuficiente.")
-
     void deveLancarExceptionQuandoEstoqueInsuficiente() throws Exception{
 
         Produto produto = new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO);
@@ -79,7 +78,6 @@ public class MovimentacaoServiceTest {
 
     @Test
     @DisplayName("Deve lançar exception quando movimentação for invalida.")
-
     void deveLancarExceptionQuandoMovimentacaoForInvalida() throws SQLException {
 
         Produto produto = new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO);

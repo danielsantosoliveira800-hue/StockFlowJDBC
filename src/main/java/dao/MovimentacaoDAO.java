@@ -84,21 +84,20 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
         String sql = "SELECT " +
                 "m.id, " +
                 "m.produto_id, " +
-                "p.nome, " +
+                "p.nome AS nome_produto, " +
                 "m.tipo," +
                 "m.quantidade, " +
                 "m.data_movimentacao " +
                 "FROM movimentacoes m " +
                 "INNER JOIN produtos p " +
                 "on m.produto_id = p.id " +
-                "WHERE m.data_movimentacao " +
-                "BETWEEN ? AND ? ";
+                "WHERE m.data_movimentacao >= ? AND m.data_movimentacao < ?";
 
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql))
         {
             statement.setDate(1, Date.valueOf(dataInicio));
-            statement.setDate(2, Date.valueOf(dataFim));
+            statement.setDate(2, Date.valueOf(dataFim.plusDays(1)));
 
             try (ResultSet resultSet = statement.executeQuery()){
 

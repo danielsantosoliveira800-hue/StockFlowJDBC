@@ -2,6 +2,7 @@ package dao;
 
 import integration.IntegrationTestBase;
 import model.Produto;
+import model.ResumoEstoque;
 import model.StatusProduto;
 import org.junit.jupiter.api.Test;
 
@@ -76,5 +77,85 @@ class ProdutoDAOTest extends IntegrationTestBase {
         List<Produto> produtos = produtoDAO.buscarPorNome("Notebook");
 
         assertEquals(2, produtos.size());
+    }
+
+    @Test
+    void deveBuscarProdutosComEstoqueBaixo(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 3, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO));
+
+        List<Produto> resultado = produtoDAO.buscarEstoqueBaixo();
+
+        assertEquals(1, resultado.size());
+        assertEquals("Monitor", resultado.get(0).getNome());
+    }
+
+    @Test
+    void deveCalcularValorTotalDoEstoque(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+
+        double total = produtoDAO.calcularValorTotalEstoque();
+
+        assertEquals(9500.0, total);
+    }
+
+    @Test
+    void deveContarTotalDeProdutos(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Mouse", 40.0, 20, StatusProduto.INATIVO));
+
+        int total = produtoDAO.contaProdutos();
+
+        assertEquals(3, total);
+    }
+
+    @Test
+    void deveContarProdutosAtivos(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Mouse", 40.0, 20, StatusProduto.INATIVO));
+
+        int total = produtoDAO.contaProdutosAtivos();
+
+        assertEquals(2, total);
+    }
+
+    @Test
+    void deveContarProdutosInativos(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Mouse", 40.0, 20, StatusProduto.INATIVO));
+
+        int total = produtoDAO.contaProdutosInativos();
+
+        assertEquals(1, total);
+    }
+
+    @Test
+    void deveSomarQuantidadeTotalDeProdutos(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Mouse", 40.0, 20, StatusProduto.INATIVO));
+
+        int total = produtoDAO.quantidadeTotalProdutos();
+
+        assertEquals(35, total);
+    }
+
+    @Test
+    void deveBuscarResumoDoEstoque(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Teclado", 100.0, 5, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Mouse", 40.0, 20, StatusProduto.INATIVO));
+
+        ResumoEstoque resumo = produtoDAO.buscarResumoEstoque();
+
+        assertEquals(3, resumo.getTotalProdutos());
+        assertEquals(35, resumo.getQuantidadeTotalProdutos());
+        assertEquals(10300.0, resumo.getValorTotalEstoque());
+        assertEquals(2, resumo.getProdutosAtivos());
+        assertEquals(1, resumo.getProdutosInativos());
     }
 }

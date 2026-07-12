@@ -323,7 +323,7 @@ public class ProdutoServiceTest {
         assertEquals(StatusProduto.INATIVO, produto.getStatus());
         verify(produtoRepository).salvarProduto(produto);
     }
-    
+
     @Test
     @DisplayName("Deve definir status ATIVO ao cadastrar produto com quantidade positiva.")
     void deveDefinirStatusAtivoQuandoQuantidadeForPositiva() {

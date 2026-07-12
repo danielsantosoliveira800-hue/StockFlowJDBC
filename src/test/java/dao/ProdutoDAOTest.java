@@ -62,7 +62,8 @@ class ProdutoDAOTest extends IntegrationTestBase {
 
         produtoDAO.desativar(1);
 
-        Produto produtoResultado = produtoDAO.buscar(1);
-        assertEquals(StatusProduto.INATIVO , produtoResultado.getStatus());
+        Produto produtoDesativado = produtoDAO.buscar(1);
+        assertEquals(StatusProduto.INATIVO, produtoDesativado.getStatus());
+        assertTrue(produtoDesativado.isDesativadoManualmente());
     }
 }

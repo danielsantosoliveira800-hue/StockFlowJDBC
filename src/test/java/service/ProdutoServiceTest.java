@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import validation.ProdutoValidator;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -322,8 +323,7 @@ public class ProdutoServiceTest {
         assertEquals(StatusProduto.INATIVO, produto.getStatus());
         verify(produtoRepository).salvarProduto(produto);
     }
-
-
+    
     @Test
     @DisplayName("Deve definir status ATIVO ao cadastrar produto com quantidade positiva.")
     void deveDefinirStatusAtivoQuandoQuantidadeForPositiva() {

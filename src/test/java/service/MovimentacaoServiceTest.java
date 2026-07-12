@@ -154,4 +154,57 @@ public class MovimentacaoServiceTest {
 
         verify(connectionMock).commit();
     }
+
+    @Test
+    @DisplayName("Deve sincronizar status para ATIVO ao registrar entrada em produto sem estoque.")
+    void deveSincronizarStatusAtivoAoRegistrarEntrada() throws SQLException {
+        Produto produto = new Produto("Teclado", 120.0, 0, StatusProduto.INATIVO);
+        produto.setId(1);
+
+        Movimentacao movimentacao = new Movimentacao(1, TipoMovimentacao.ENTRADA, 5);
+
+        Connection connectionMock = mock(Connection.class);
+
+        when(dataSource.getConnection()).thenReturn(connectionMock);
+        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+
+        movimentacaoService.registrarMovimentacao(movimentacao);
+
+        verify(produtoRepository).atualizarStatus(any(Connection.class), eq(1), eq(StatusProduto.ATIVO));
+    }
+
+    @Test
+    @DisplayName("Deve sincronizar status para INATIVO quando ao registrar saida que zera o estoque.")
+    void deveSincronizarStatusInativoAoRegistrarSaida() throws SQLException {
+        Produto produto = new Produto("Mouse", 40.0, 150, StatusProduto.ATIVO);
+        produto.setId(1);
+
+        Movimentacao movimentacaoMock = new Movimentacao(1, TipoMovimentacao.SAIDA, 150);
+
+        Connection connectionMock = mock(Connection.class);
+
+        when(dataSource.getConnection()).thenReturn(connectionMock);
+        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+
+        movimentacaoService.registrarMovimentacao(movimentacaoMock);
+        verify(produtoRepository).atualizarStatus(any(Connection.class), eq(1), eq(StatusProduto.INATIVO));
+    }
+
+    @Test
+    @DisplayName("Não deve sincronizar status quando produto foi desativado manualmente.")
+    void naoDeveSincronizarStatusQuandoDesativadoManualmente() throws SQLException {
+        Produto produto = new Produto("Mouse", 40.0, 150, StatusProduto.INATIVO);
+        produto.setId(1);
+        produto.setDesativadoManualmente(true);
+
+        Movimentacao movimentacao = new Movimentacao(1, TipoMovimentacao.SAIDA, 50);
+        Connection connectionMock = mock(Connection.class);
+
+        when(dataSource.getConnection()).thenReturn(connectionMock);
+        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+
+        movimentacaoService.registrarMovimentacao(movimentacao);
+
+        verify(produtoRepository, never()).atualizarStatus(any(Connection.class), anyInt(), any(StatusProduto.class));
+    }
 }

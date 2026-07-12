@@ -66,4 +66,15 @@ class ProdutoDAOTest extends IntegrationTestBase {
         assertEquals(StatusProduto.INATIVO, produtoDesativado.getStatus());
         assertTrue(produtoDesativado.isDesativadoManualmente());
     }
+
+    @Test
+    void deveBuscarProdutoPorNome(){
+        produtoDAO.salvarProduto(new Produto("Notebook Dell", 3500.0, 5, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Notebook Lenovo", 2800.0, 3, StatusProduto.ATIVO));
+        produtoDAO.salvarProduto(new Produto("Mouse", 40.0, 20, StatusProduto.ATIVO));
+
+        List<Produto> produtos = produtoDAO.buscarPorNome("Notebook");
+
+        assertEquals(2, produtos.size());
+    }
 }

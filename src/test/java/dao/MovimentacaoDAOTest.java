@@ -52,4 +52,13 @@ public class MovimentacaoDAOTest extends IntegrationTestBase{
         assertEquals(1, resultado.size());
         assertEquals("Monitor", resultado.get(0).getNomeProduto());
     }
+
+    @Test
+    void deveCalcularValorDeUmProdutoViaFunction(){
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+
+        double valor = produtoDAO.calcularValorProduto(1);
+
+        assertEquals(9000.0, valor);
+    }
 }

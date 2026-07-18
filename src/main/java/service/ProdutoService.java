@@ -4,6 +4,8 @@ import dao.ProdutoRepository;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
 import model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import validation.ProdutoValidator;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ public class ProdutoService {
     private final MovimentacaoService movimentacaoService;
     private final ProdutoValidator produtoValidator;
     private final ProdutoRepository produtoRepository;
+    private static final Logger auditLogger = LoggerFactory.getLogger("AUDIT");
 
     public ProdutoService() {
         this(new MovimentacaoService(), new ProdutoDAO(), new ProdutoValidator());
@@ -37,6 +40,9 @@ public class ProdutoService {
         produto.setStatus(statusInicial);
 
         produtoRepository.salvarProduto(produto);
+
+        auditLogger.info("Produto cadastrado: nome={}, preco={}, quantidade={}, status={}",
+                produto.getNome(), produto.getPreco(), produto.getQuantidade(), produto.getStatus());
     }
 
     public List<Produto> listar(){
@@ -57,6 +63,9 @@ public class ProdutoService {
         Produto produto = buscarProduto(id);
 
         produtoRepository.desativar(produto.getId());
+
+        auditLogger.info("Produto desativado manualmente: id={}, nome={}",
+                produto.getId(), produto.getNome());
     }
 
     public Produto buscarPorID(int id) {
@@ -201,5 +210,7 @@ public class ProdutoService {
     public void reativar(int id){
         Produto produto =  buscarProduto(id);
         produtoRepository.reativar(produto.getId());
+        auditLogger.info("Produto reativado: id={}, nome={}",
+                produto.getId(), produto.getNome());
     }
 }

@@ -6,12 +6,16 @@ import model.Produto;
 import model.ProdutoRanking;
 import model.ResumoEstoque;
 import model.StatusProduto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ProdutoDAO implements ProdutoRepository {
+    private static final Logger logger = LoggerFactory.getLogger(ProdutoDAO.class);
 
     @Override
     public void salvarProduto(Produto produto) {
@@ -38,6 +42,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.executeUpdate();
 
         } catch (SQLException e) {
+            logger.error("Erro ao salvar produto: {}", produto.getNome(), e);
             throw new PersistenciaException("Erro ao salvar produto.",e);
         }
     }
@@ -68,6 +73,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return produtos;
 
         } catch (SQLException e) {
+            logger.error("Erro ao listar produtos.", e);
             throw new PersistenciaException("Erro ao listar produto.",e);
         }
     }
@@ -94,6 +100,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.executeUpdate();
 
         } catch (SQLException e) {
+            logger.error("Erro ao atualizar produto id = {}: novo preço = {}", id, novoPreco, e);
             throw new PersistenciaException("Erro ao atualizar produto.",e);
         }
     }
@@ -118,6 +125,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
         } catch (SQLException e) {
 
+            logger.error("Erro ao desativar produto id = {}", id, e);
             throw new PersistenciaException("Erro ao desativar produto.",e);
         }
     }
@@ -143,6 +151,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             return null;
         } catch (SQLException e) {
+            logger.error("Erro ao buscar produto id = {}",id ,e );
             throw new PersistenciaException("Erro ao buscar produto.",e);
         }
     }
@@ -167,6 +176,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return null;
 
         } catch (SQLException e) {
+        logger.error("Erro ao buscar produto (em transação) id = {}",id ,e);
             throw new PersistenciaException("Erro ao buscar produto.",e);
         }
     }
@@ -200,6 +210,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             return produtos;
         } catch (SQLException e) {
+        logger.error("Erro ao buscar produto por nome: {}",nomeBusca, e);
             throw new PersistenciaException("Erro ao buscar produto por nome.",e);
         }
     }
@@ -222,6 +233,7 @@ public class ProdutoDAO implements ProdutoRepository {
             statement.executeUpdate();
 
         } catch (SQLException e) {
+            logger.error("Erro ao atualizar quantidade produto id = {}, nova quantidade = {}", id, novaQuantidade, e);
             throw new PersistenciaException("Erro ao atualizar quantidade.",e);
         }
     }
@@ -250,6 +262,7 @@ public class ProdutoDAO implements ProdutoRepository {
             }
             return produtos;
         } catch (SQLException e) {
+            logger.error("Erro ao buscar estoque baixo.", e);
             throw new PersistenciaException("Erro ao buscar estoque baixo.",e);
         }
     }
@@ -279,6 +292,7 @@ public class ProdutoDAO implements ProdutoRepository {
             }
             return produtos;
         } catch (SQLException e) {
+            logger.error("Erro ao buscar produtos ativos.", e);
             throw new PersistenciaException("Erro ao buscar produtos ativos.",e);
         }
     }
@@ -304,6 +318,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
             return 0;
         } catch (SQLException e) {
+            logger.error("Erro ao calcular valor total do estoque.", e);
             throw new PersistenciaException("Erro ao calcular valor do estoque.",e);
         }
     }
@@ -345,6 +360,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
+            logger.error("Erro ao contar produto.", e);
             throw new PersistenciaException("Erro ao contar produtos.",e);
         }
     }
@@ -372,6 +388,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
+            logger.error("Erro ao contar produtos ativos.", e);
             throw new PersistenciaException("Erro ao contar produtos ativos.",e);
         }
     }
@@ -401,6 +418,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
+            logger.error("Erro ao contar produtos inativos.", e);
             throw new PersistenciaException("Erro ao contar produtos inativos.",e);
         }
     }
@@ -428,6 +446,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return 0;
 
         } catch (SQLException e) {
+            logger.error("Erro ao contar quantidade total de produtos.", e);
             throw new PersistenciaException("Erro ao contar o total de produtos.",e);
         }
     }
@@ -459,7 +478,7 @@ public class ProdutoDAO implements ProdutoRepository {
             }
             return rankingDeProdutos;
         } catch (SQLException e) {
-
+            logger.error("Erro ao buscar ranking de produtos.", e);
             throw new PersistenciaException("Erro ao buscar ranking de produtos.",e);
         }
     }
@@ -491,6 +510,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return null;
 
         }catch (SQLException e){
+            logger.error("Erro ao buscar resumo do estoque.", e);
             throw new PersistenciaException("Erro ao resumir estoque.",e);
         }
     }
@@ -515,6 +535,7 @@ public class ProdutoDAO implements ProdutoRepository {
             return statement.getDouble(1);
 
         }catch (SQLException e){
+            logger.error("Erro ao calculara valor do produto id = {}.", id , e);
             throw new PersistenciaException("Erro ao calcular valor do produto.",e);
         }
     }
@@ -547,7 +568,8 @@ public class ProdutoDAO implements ProdutoRepository {
                 try {
                     connection.rollback();
                 } catch (SQLException ex) {
-                    throw new PersistenciaException("Erro ao executar rollback do lote.",e);
+                    logger.error("Erro ao exevutar rollback do lote.", ex);
+                    throw new PersistenciaException("Erro ao executar rollback do lote.",ex);
                 }
             }
             throw new PersistenciaException("Erro ao inserir produtos em lote.",e);
@@ -560,6 +582,7 @@ public class ProdutoDAO implements ProdutoRepository {
                     connection.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro ao fechar conexão após inserir produtos em lote.", e);
                 throw new PersistenciaException("Erro ao inserir produto em lote.",e);
             }
         }
@@ -576,13 +599,12 @@ public class ProdutoDAO implements ProdutoRepository {
         Connection connection= null;
         PreparedStatement statement = null;
         Savepoint savepoint = null;
-
         try {
 
             connection = ConnectionFactory.getConnection();
             connection.setAutoCommit(false);
 
-            System.out.println("começando transação.");
+            logger.info("Iniciando transação de inserção com savepoint. Total de produtos: {}", produtos.size());
             statement = connection.prepareStatement(sql);
 
             int contador = 0;
@@ -591,35 +613,37 @@ public class ProdutoDAO implements ProdutoRepository {
 
                 preencherStatement(statement,produto);
 
-                System.out.println("Inserindo produto: "+ produto.getNome());
+                logger.info("Inserindo produto: {}", produto.getNome());
                 statement.executeUpdate();
                 contador++;
 
                 if (contador == 2){
-                    savepoint =connection.setSavepoint("PONTO_SEGURO");
+                    savepoint = connection.setSavepoint("PONTO_SEGURO");
                 }
 
                 if (contador == 4){
                     throw new SQLException("Erro simulado para teste");
                 }
-                
+
             }
 
             connection.commit();
-            System.out.println("Todos os produtos foram cadastrados com sucesso.");
+            logger.info("Todos os produtos foram cadastrados com sucesso. Total: {}", produtos.size());
 
         }catch (SQLException e){
+            logger.error("Erro ao inserir produtos com savepoint.", e);
             try {
                 if (connection !=  null && savepoint != null){
                     connection.rollback(savepoint);
-                    System.out.println("Rolback realizado com savePoint.");
+                    logger.info("Rollback realizado com savepoint.");
                     connection.commit();
-                    System.out.println("commit realizado.");
+                    logger.info("Commit realizado após rollback parcial.");
                 }else {
                     connection.rollback();
-                    System.out.println("Roolback total. ");
+                    logger.info("Rollback total realizado.");
                 }
             }catch (SQLException e1){
+                logger.error("Erro ao executar rollback com savepoint.", e1);
                 throw new PersistenciaException("Erro rollback com savenpoint.",e1);
             }
         }finally {
@@ -632,6 +656,7 @@ public class ProdutoDAO implements ProdutoRepository {
                     connection.close();
                 }
             }catch (SQLException e){
+                logger.error("Erro ao fechar conexão após inserir produtos com savepoint.", e);
                 throw new PersistenciaException("Erro ao inserir produto com savePoint.",e);
             }
         }

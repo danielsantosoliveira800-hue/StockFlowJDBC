@@ -181,4 +181,33 @@ class ProdutoDAOTest extends IntegrationTestBase {
         assertEquals(13, ranking.get(0).getQuantidadeMovimentada());
 
     }
+
+    @Test
+    void deveInserirProdutosEmLoteComSucesso(){
+        List<Produto> produtos = List.of(
+                new Produto("Produto1", 10.0, 5, StatusProduto.ATIVO),
+                new Produto("Produto2", 20.0, 5, StatusProduto.ATIVO)
+        );
+
+        produtoDAO.inserirProdutoEmLote(produtos);
+
+        assertEquals(2, produtoDAO.contaProdutos());
+    }
+
+    @Test
+    void deveInserirParcialmenteComRollbackParaSavepoint(){
+        List<Produto> produtos = List.of(
+                new Produto("Produto1", 10.0, 5, StatusProduto.ATIVO),
+                new Produto("Produto2", 20.0, 5, StatusProduto.ATIVO),
+                new Produto("Produto3", 30.0, 5, StatusProduto.ATIVO),
+                new Produto("Produto4", 40.0, 5, StatusProduto.ATIVO)
+        );
+
+        produtoDAO.inserirProdutosComSavepoint(produtos);
+
+        List<Produto> resultado = produtoDAO.listar();
+        assertEquals(2, resultado.size());
+        assertEquals("Produto1", resultado.get(0).getNome());
+        assertEquals("Produto2", resultado.get(1).getNome());
+    }
 }

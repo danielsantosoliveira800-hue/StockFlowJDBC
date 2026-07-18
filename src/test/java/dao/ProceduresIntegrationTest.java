@@ -7,12 +7,15 @@ import model.StatusProduto;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProceduresIntegrationTest extends IntegrationTestBase {
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
+    private final AuditoriaProdutosDAO auditoriaProdutosDAO = new AuditoriaProdutosDAO();
 
     @Test
     void deveSincronizarStatusDosProdutos() throws SQLException {
@@ -60,5 +63,25 @@ public class ProceduresIntegrationTest extends IntegrationTestBase {
             assertEquals(1, resultSet.getInt("produtos_ativos"));
             assertEquals(1, resultSet.getInt("produtos_inativos"));
         }
+    }
+
+    @Test
+    void deveLimparAuditoriaAntiga() throws SQLException{
+        produtoDAO.salvarProduto(new Produto("Monitor", 900.0, 10, StatusProduto.ATIVO));
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement =  connection.prepareStatement("""
+                UPDATE auditoria_produtos SET data_alteracao = ? 
+                WHERE produto_id = 1""")
+        ){
+            statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minusYears(2)));
+            statement.executeUpdate();
+        }
+        try (Connection connection = ConnectionFactory.getConnection();
+             CallableStatement statement = connection.prepareCall("{call sp_limpar_auditoria_antiga()}"))
+        {
+            statement.execute();
+        }
+        assertEquals(0, auditoriaProdutosDAO.listar().size());
     }
 }

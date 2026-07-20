@@ -11,6 +11,8 @@ import model.Movimentacao;
 import model.Produto;
 import model.StatusProduto;
 import model.TipoMovimentacao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import validation.MovimentacaoValidator;
 
 import javax.sql.DataSource;
@@ -27,6 +29,7 @@ public class MovimentacaoService {
     private final ProdutoRepository produtoRepository;
     private final MovimentacaoValidator movimentacaoValidator;
     private final DataSource dataSource;
+    private static final Logger transactionLogger = LoggerFactory.getLogger("TRANSACTION");
 
     public MovimentacaoService() {
 
@@ -48,6 +51,8 @@ public class MovimentacaoService {
 
         movimentacaoValidator.validarMovimentacao(movimentacao);
 
+        transactionLogger.info("Iniciando uma movimentação: produto_id={}, tipo={}, quantidade={}",
+                movimentacao.getProduto_id(), movimentacao.getTipo(), movimentacao.getQuantidade());
             Connection connection = null;
             try {
 
@@ -71,16 +76,22 @@ public class MovimentacaoService {
 
                 commit(connection);
 
+            transactionLogger.info("Movimentação confirmada (commit): produto_id={}, tipo={}, novaQuantidade={}",
+                    movimentacao.getProduto_id(), movimentacao.getTipo(), novaQuantidade);
+
             } catch (RuntimeException e) {
 
+                transactionLogger.info("Rollback executado (RuntimeException) para produto_id={}: {}",
+                        movimentacao.getProduto_id(), e.getMessage());
                 rollback(connection);
                 throw e;
 
             }catch (SQLException e){
                 rollback(connection);
+                transactionLogger.warn("Rollback executado (SQLException) para produto_id={}: {}",
+                        movimentacao.getProduto_id(), e.getMessage());
                 throw new PersistenciaException("Erro ao registrar movimentação.",e);
             }finally {
-
                 fecharConexao(connection);
             }
         }

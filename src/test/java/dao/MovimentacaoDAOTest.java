@@ -15,6 +15,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import exception.PersistenciaException;
+import org.slf4j.LoggerFactory;
+
 public class MovimentacaoDAOTest extends IntegrationTestBase{
 
     private final MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
@@ -60,5 +67,27 @@ public class MovimentacaoDAOTest extends IntegrationTestBase{
         double valor = produtoDAO.calcularValorProduto(1);
 
         assertEquals(9000.0, valor);
+    }
+
+    @Test
+    void deveLogarErroAoRegistrarMovimentacaoComProdutoInexistente() throws SQLException {
+        Logger erroLogger = (Logger) LoggerFactory.getLogger(MovimentacaoDAO.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        erroLogger.addAppender(listAppender);
+
+        Movimentacao movimentacao = new Movimentacao(9999, TipoMovimentacao.SAIDA, 8000);
+
+        try (
+                Connection connection = ConnectionFactory.getConnection()){
+            assertThrows(PersistenciaException.class,
+                    () -> movimentacaoDAO.registrarMovimentacao(connection, movimentacao));
+        }
+
+        boolean encontrouLogErro = listAppender.list.stream()
+                .anyMatch(evento -> evento.getLevel() == Level.ERROR);
+
+        assertTrue(encontrouLogErro);
+        erroLogger.detachAppender(listAppender);
     }
 }

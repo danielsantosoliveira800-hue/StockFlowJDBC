@@ -381,7 +381,6 @@ public class ProdutoServiceTest {
                         .contains("Produto desativado manualmente   ")
                              && evento.getFormattedMessage().contains("id=1"));
 
-        logs.forEach(evento -> System.out.println("[" + evento.getLevel() + "] " + evento.getFormattedMessage()));
         assertTrue(encontrouLogAuditoria);
         auditLogger.detachAppender(listAppender);
     }

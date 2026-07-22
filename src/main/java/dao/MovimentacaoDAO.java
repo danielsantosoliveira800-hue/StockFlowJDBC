@@ -3,6 +3,8 @@ import db.ConnectionFactory;
 import exception.PersistenciaException;
 import model.Movimentacao;
 import model.TipoMovimentacao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovimentacaoDAO implements MovimentacaoRepository{
+
+    private static final Logger logger = LoggerFactory.getLogger(MovimentacaoDAO.class);
 
     @Override
     public void registrarMovimentacao(Connection connection, Movimentacao movimentacao){
@@ -35,6 +39,8 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
             statement.executeUpdate();
 
         }catch (SQLException e){
+            logger.error("Erro ao registrar movimentação: produto_id={}, tipo={}, quantidade={}",
+                    movimentacao.getProduto_id(), movimentacao.getTipo(), movimentacao.getQuantidade(), e);
             throw new PersistenciaException("Erro ao registrar movimentação.",e);
         }
     }
@@ -75,6 +81,8 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
             return movimentacoes;
 
         }catch (SQLException e){
+
+            logger.error("Erro ao listar movimentações.", e);
             throw new PersistenciaException("Erro ao listar movimentações.",e);
         }
     }
@@ -112,6 +120,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository{
 
         }catch (SQLException e){
 
+            logger.error("Erro ao buscar movimentação por período: {} até {}", dataInicio, dataFim, e);
             throw new PersistenciaException("Erro ao buscar movimentação por periodo.",e);
         }
         }

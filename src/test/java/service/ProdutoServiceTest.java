@@ -1,5 +1,7 @@
 package service;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import dao.ProdutoRepository;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
@@ -10,8 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import validation.ProdutoValidator;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import ch.qos.logback.classic.Logger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -346,5 +357,32 @@ public class ProdutoServiceTest {
 
         verify(produtoRepository).buscar(1);
         verify(produtoRepository).reativar(1);
+    }
+
+    @Test
+    @DisplayName("Deve registrar log de auditoria ao desativar produto.")
+    void deveLogarAuditoriaAoDesativarProduto(){
+
+        Logger auditLogger = (Logger) LoggerFactory.getLogger("AUDIT");
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        auditLogger.addAppender(listAppender);
+
+        Produto produto = new Produto("Mouse", 40.00, 150, StatusProduto.ATIVO);
+        produto.setId(1);
+        when(produtoRepository.buscar(1)).thenReturn(produto);
+
+        produtoService.desativar(1);
+
+        List<ILoggingEvent> logs = listAppender.list;
+
+        boolean encontrouLogAuditoria = logs.stream()
+                .anyMatch(evento -> evento.getFormattedMessage()
+                        .contains("Produto desativado manualmente   ")
+                             && evento.getFormattedMessage().contains("id=1"));
+
+        logs.forEach(evento -> System.out.println("[" + evento.getLevel() + "] " + evento.getFormattedMessage()));
+        assertTrue(encontrouLogAuditoria);
+        auditLogger.detachAppender(listAppender);
     }
 }

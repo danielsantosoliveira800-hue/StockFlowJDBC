@@ -1,5 +1,9 @@
 package service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import dao.MovimentacaoRepository;
 import dao.ProdutoRepository;
 import exception.EstoqueInsuficienteException;
@@ -12,13 +16,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import validation.MovimentacaoValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
+import static model.StatusProduto.ATIVO;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -52,7 +60,7 @@ public class MovimentacaoServiceTest {
     @DisplayName("Deve lançar exception quando estoque estiver insuficiente.")
     void deveLancarExceptionQuandoEstoqueInsuficiente() throws Exception{
 
-        Produto produto = new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO);
+        Produto produto = new Produto("Teclado", 135.0, 50, ATIVO);
         produto.setId(1);
 
         Movimentacao movimentacao =  new Movimentacao(1, TipoMovimentacao.SAIDA,50);
@@ -80,7 +88,7 @@ public class MovimentacaoServiceTest {
     @DisplayName("Deve lançar exception quando movimentação for invalida.")
     void deveLancarExceptionQuandoMovimentacaoForInvalida() throws SQLException {
 
-        Produto produto = new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO);
+        Produto produto = new Produto("Teclado", 135.0, 50, ATIVO);
         produto.setId(1);
 
         Movimentacao movimentacaoMock =  new Movimentacao();
@@ -104,7 +112,7 @@ public class MovimentacaoServiceTest {
                 "Teclado",
                 120.0,
                 40,
-                StatusProduto.ATIVO
+                ATIVO
         );
         produto.setId(1);
 
@@ -132,7 +140,7 @@ public class MovimentacaoServiceTest {
                 "Teclado",
                 120.0,
                 40,
-                StatusProduto.ATIVO
+                ATIVO
         );
         produto.setId(1);
 
@@ -168,13 +176,13 @@ public class MovimentacaoServiceTest {
 
         movimentacaoService.registrarMovimentacao(movimentacao);
 
-        verify(produtoRepository).atualizarStatus(any(Connection.class), eq(1), eq(StatusProduto.ATIVO));
+        verify(produtoRepository).atualizarStatus(any(Connection.class), eq(1), eq(ATIVO));
     }
 
     @Test
     @DisplayName("Deve sincronizar status para INATIVO quando ao registrar saida que zera o estoque.")
     void deveSincronizarStatusInativoAoRegistrarSaida() throws SQLException {
-        Produto produto = new Produto("Mouse", 40.0, 150, StatusProduto.ATIVO);
+        Produto produto = new Produto("Mouse", 40.0, 150, ATIVO);
         produto.setId(1);
 
         Movimentacao movimentacaoMock = new Movimentacao(1, TipoMovimentacao.SAIDA, 150);
@@ -204,5 +212,40 @@ public class MovimentacaoServiceTest {
         movimentacaoService.registrarMovimentacao(movimentacao);
 
         verify(produtoRepository, never()).atualizarStatus(any(Connection.class), anyInt(), any(StatusProduto.class));
+    }
+
+    @Test
+    @DisplayName("Deve registrar log de rollback quando estoque estiver insuficiente.")
+    void deveLogarRollbackQuandoEstoqueInsuficiente() throws SQLException {
+
+        Logger transactionLogger = (Logger) LoggerFactory.getLogger("TRANSACTION");
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        transactionLogger.addAppender(listAppender);
+
+        Produto produto = new Produto("Teclado", 135.00, 50, ATIVO);
+        produto.setId(1);
+
+        Movimentacao movimentacao = new Movimentacao(1, TipoMovimentacao.SAIDA, 50);
+
+        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+
+        Connection connectionMock = mock(Connection.class);
+        when(dataSource.getConnection()).thenReturn(connectionMock);
+
+        doThrow(new EstoqueInsuficienteException())
+                .when(movimentacaoValidator)
+                .validarSaida(produto, movimentacao);
+
+        assertThrows(RuntimeException.class, () -> {movimentacaoService.registrarMovimentacao(movimentacao);});
+
+        List<ILoggingEvent> logs = listAppender.list;
+
+        boolean encontrouLogDeRollback = logs.stream()
+                .anyMatch(evento -> evento.getLevel() == Level.WARN
+                && evento.getFormattedMessage().contains("Rollback executado"));
+
+        assertTrue(encontrouLogDeRollback);
+        transactionLogger.detachAppender(listAppender);
     }
 }

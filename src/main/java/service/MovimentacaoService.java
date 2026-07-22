@@ -81,7 +81,7 @@ public class MovimentacaoService {
 
             } catch (RuntimeException e) {
 
-                transactionLogger.info("Rollback executado (RuntimeException) para produto_id={}: {}",
+                transactionLogger.warn("Rollback executado (RuntimeException) para produto_id={}: {}",
                         movimentacao.getProduto_id(), e.getMessage());
                 rollback(connection);
                 throw e;

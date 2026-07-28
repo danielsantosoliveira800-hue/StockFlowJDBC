@@ -132,9 +132,7 @@ public class ProdutoDAO implements ProdutoRepository {
 
     @Override
     public Produto buscar(Connection connection, int id) {
-        String sql =
-                "SELECT * FROM produtos " +
-                        "WHERE id = ? ";
+        String sql = " SELECT * FROM produtos WHERE id = ? FOR UPDATE";
 
         try (
                 PreparedStatement statement =

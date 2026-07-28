@@ -707,6 +707,24 @@ public class ProdutoDAO implements ProdutoRepository {
         }
     }
 
+    @Override
+    public void gerarSnapshotDasDashboard() {
+        String sql = "{call sp_snapshot_dashboard()}";
+
+        try (
+                Connection connection = ConnectionFactory.getConnection();
+                CallableStatement statement = connection.prepareCall(sql);
+
+                ){
+            statement.execute();
+            logger.info("Snapshot do dashboard gerado com sucesso.");
+
+        }catch (SQLException e){
+            logger.error("Erro ao gerar snapshot do dashboard.", e);
+            throw new PersistenciaException("Erro ao gerar snapshot do dashboard.", e);
+        }
+    }
+
     private void preencherStatement(PreparedStatement statement, Produto produto) throws SQLException {
 
         statement.setString(1, produto.getNome());

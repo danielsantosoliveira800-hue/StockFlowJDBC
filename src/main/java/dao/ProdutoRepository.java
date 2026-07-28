@@ -53,4 +53,6 @@ public interface ProdutoRepository {
     void reativar(int id);
 
     void atualizarStatus(Connection connection, int id, StatusProduto status);
+
+    void gerarSnapshotDasDashboard();
 }

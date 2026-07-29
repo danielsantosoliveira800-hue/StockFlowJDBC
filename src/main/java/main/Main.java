@@ -3,6 +3,7 @@ package main;
 import dao.MovimentacaoDAO;
 import dao.ProdutoDAO;
 import db.ConnectionFactory;
+import scheduler.DashboardSnapshotScheduler;
 import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;
@@ -12,16 +13,20 @@ import validation.ProdutoValidator;
 
 public class Main {
     public static void main(String[] args) {
+
         ProdutoDAO produtoDAO = new ProdutoDAO();
         MovimentacaoDAO movimentacaoDAO = new MovimentacaoDAO();
         MovimentacaoValidator movimentacaoValidator =  new MovimentacaoValidator();
         AuditoriaProdutoService auditoriaProdutoService = new AuditoriaProdutoService();
+        DashboardSnapshotScheduler scheduler = new DashboardSnapshotScheduler(produtoDAO);
+
+        scheduler.iniciar(30);
 
         MovimentacaoService movimentacaoService = new MovimentacaoService
-                                                        (movimentacaoDAO,
-                                                        produtoDAO,
+                                                                (movimentacaoDAO,
+                                                                produtoDAO,
                                                                 movimentacaoValidator,
-                                                        ConnectionFactory.getDataSource());
+                                                                ConnectionFactory.getDataSource());
 
         ProdutoValidator produtoValidator = new ProdutoValidator();
 
@@ -30,5 +35,6 @@ public class Main {
         Menu menu = new Menu(produtoService, movimentacaoService, auditoriaProdutoService);
 
         menu.exibir();
+        scheduler.parar();
     }
 }

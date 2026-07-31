@@ -1,4 +1,4 @@
-package model;
+package domain.model;
 
 public class ProdutoRanking {
     private String nomeProduto;

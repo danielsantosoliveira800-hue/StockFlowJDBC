@@ -3,9 +3,9 @@ package service;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import dao.ProdutoRepository;
+import domain.model.*;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
-import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,17 +15,10 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import validation.ProdutoValidator;
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import ch.qos.logback.classic.Logger;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -378,7 +371,7 @@ public class ProdutoServiceTest {
 
         boolean encontrouLogAuditoria = logs.stream()
                 .anyMatch(evento -> evento.getFormattedMessage()
-                        .contains("Produto desativado manualmente   ")
+                        .contains("Produto desativado manualmente")
                              && evento.getFormattedMessage().contains("id=1"));
 
         assertTrue(encontrouLogAuditoria);

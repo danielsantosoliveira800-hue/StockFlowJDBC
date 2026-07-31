@@ -1,8 +1,8 @@
 package dao;
 
 import db.ConnectionFactory;
+import domain.model.*;
 import integration.IntegrationTestBase;
-import model.*;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

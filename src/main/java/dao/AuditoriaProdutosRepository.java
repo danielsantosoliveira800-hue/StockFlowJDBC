@@ -1,6 +1,6 @@
 package dao;
 
-import model.AuditoriaProdutos;
+import domain.model.AuditoriaProdutos;
 
 import java.util.List;
 

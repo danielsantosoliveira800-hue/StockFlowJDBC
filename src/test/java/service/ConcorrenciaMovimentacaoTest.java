@@ -4,10 +4,10 @@ import dao.MovimentacaoDAO;
 import dao.ProdutoDAO;
 import db.ConnectionFactory;
 import integration.IntegrationTestBase;
-import model.Movimentacao;
-import model.Produto;
-import model.StatusProduto;
-import model.TipoMovimentacao;
+import domain.model.Movimentacao;
+import domain.model.Produto;
+import domain.model.StatusProduto;
+import domain.model.TipoMovimentacao;
 import org.junit.jupiter.api.Test;
 import validation.MovimentacaoValidator;
 

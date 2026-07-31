@@ -1,8 +1,8 @@
 package dao;
 import db.ConnectionFactory;
 import exception.PersistenciaException;
-import model.Movimentacao;
-import model.TipoMovimentacao;
+import domain.model.Movimentacao;
+import domain.model.TipoMovimentacao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

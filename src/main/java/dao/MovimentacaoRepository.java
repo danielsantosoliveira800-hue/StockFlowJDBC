@@ -1,6 +1,6 @@
 package dao;
 
-import model.Movimentacao;
+import domain.model.Movimentacao;
 
 import java.util.List;
 import java.sql.Connection;

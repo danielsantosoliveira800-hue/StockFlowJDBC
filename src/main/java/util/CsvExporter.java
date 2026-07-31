@@ -1,6 +1,6 @@
 package util;
 
-import model.ProdutoRanking;
+import domain.model.ProdutoRanking;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.util.List;

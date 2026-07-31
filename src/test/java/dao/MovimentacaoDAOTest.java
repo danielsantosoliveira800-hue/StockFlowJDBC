@@ -1,10 +1,10 @@
 package dao;
 
 import integration.IntegrationTestBase;
-import model.Movimentacao;
-import model.Produto;
-import model.StatusProduto;
-import model.TipoMovimentacao;
+import domain.model.Movimentacao;
+import domain.model.Produto;
+import domain.model.StatusProduto;
+import domain.model.TipoMovimentacao;
 import db.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,7 @@ package service;
 
 import dao.AuditoriaProdutosDAO;
 import dao.AuditoriaProdutosRepository;
-import model.AuditoriaProdutos;
+import domain.model.AuditoriaProdutos;
 
 import java.util.List;
 

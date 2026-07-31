@@ -1,9 +1,9 @@
 package dao;
 
-import model.Produto;
-import model.ProdutoRanking;
-import model.ResumoEstoque;
-import model.StatusProduto;
+import domain.model.Produto;
+import domain.model.ProdutoRanking;
+import domain.model.ResumoEstoque;
+import domain.model.StatusProduto;
 
 import java.sql.Connection;
 import java.util.List;

@@ -1,7 +1,7 @@
 package validation;
 
 import exception.ValidacaoException;
-import model.Produto;
+import domain.model.Produto;
 
 public class ProdutoValidator {
 

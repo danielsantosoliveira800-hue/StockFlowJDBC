@@ -2,10 +2,10 @@ package dao;
 
 import db.ConnectionFactory;
 import exception.PersistenciaException;
-import model.Produto;
-import model.ProdutoRanking;
-import model.ResumoEstoque;
-import model.StatusProduto;
+import domain.model.Produto;
+import domain.model.ProdutoRanking;
+import domain.model.ResumoEstoque;
+import domain.model.StatusProduto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,9 +1,9 @@
 package service;
 import dao.ProdutoDAO;
 import dao.ProdutoRepository;
+import domain.model.*;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
-import model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import validation.ProdutoValidator;

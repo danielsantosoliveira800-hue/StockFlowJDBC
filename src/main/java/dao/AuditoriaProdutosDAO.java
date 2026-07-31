@@ -2,7 +2,7 @@ package dao;
 
 import db.ConnectionFactory;
 import exception.PersistenciaException;
-import model.AuditoriaProdutos;
+import domain.model.AuditoriaProdutos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

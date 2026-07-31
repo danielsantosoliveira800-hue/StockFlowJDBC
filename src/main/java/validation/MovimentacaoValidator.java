@@ -4,9 +4,9 @@ import exception.EstoqueInsuficienteException;
 import exception.ProdutoNaoEncontradoException;
 import exception.TipoMovimentacaoInvalidaException;
 import exception.ValidacaoException;
-import model.Movimentacao;
-import model.Produto;
-import model.TipoMovimentacao;
+import domain.model.Movimentacao;
+import domain.model.Produto;
+import domain.model.TipoMovimentacao;
 
 public class MovimentacaoValidator {
 

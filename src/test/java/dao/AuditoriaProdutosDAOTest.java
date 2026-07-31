@@ -2,9 +2,9 @@ package dao;
 
 import db.ConnectionFactory;
 import integration.IntegrationTestBase;
-import model.AuditoriaProdutos;
-import model.Produto;
-import model.StatusProduto;
+import domain.model.AuditoriaProdutos;
+import domain.model.Produto;
+import domain.model.StatusProduto;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

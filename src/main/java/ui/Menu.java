@@ -1,6 +1,6 @@
 package ui;
 
-import model.*;
+import domain.model.*;
 import service.MovimentacaoService;
 import service.AuditoriaProdutoService;
 import service.ProdutoService;

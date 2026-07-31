@@ -2,12 +2,11 @@ package dao;
 
 import db.ConnectionFactory;
 import integration.IntegrationTestBase;
-import model.Produto;
-import model.StatusProduto;
+import domain.model.Produto;
+import domain.model.StatusProduto;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

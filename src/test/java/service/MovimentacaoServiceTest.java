@@ -5,7 +5,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import domain.repository.MovimentacaoRepository;
-import dao.ProdutoRepository;
+import domain.repository.ProdutoTransacionalRepository;
 import exception.EstoqueInsuficienteException;
 import domain.model.Movimentacao;
 import domain.model.Produto;
@@ -36,7 +36,7 @@ public class MovimentacaoServiceTest {
     @Mock
     private MovimentacaoRepository movimentacaoRepository;
     @Mock
-    private ProdutoRepository produtoRepository;
+    private ProdutoTransacionalRepository produtoTransacionalRepository;
     @Mock
     private MovimentacaoValidator movimentacaoValidator;
     @Mock
@@ -50,7 +50,7 @@ public class MovimentacaoServiceTest {
 
         movimentacaoService = new MovimentacaoService(
                 movimentacaoRepository,
-                produtoRepository,
+                produtoTransacionalRepository,
                 movimentacaoValidator,
                 dataSource
         );
@@ -65,7 +65,7 @@ public class MovimentacaoServiceTest {
 
         Movimentacao movimentacao =  new Movimentacao(1, TipoMovimentacao.SAIDA,50);
 
-        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
 
         Connection connectionMock = mock(Connection.class);
         when(dataSource.getConnection()).thenReturn(connectionMock);
@@ -98,7 +98,7 @@ public class MovimentacaoServiceTest {
         Connection connectionMock = mock(Connection.class);
         when(dataSource.getConnection()).thenReturn(connectionMock);
 
-        when(produtoRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
 
         assertThrows(RuntimeException.class, () -> {
             movimentacaoService.registrarMovimentacao(movimentacaoMock);
@@ -122,11 +122,11 @@ public class MovimentacaoServiceTest {
 
         when(dataSource.getConnection()).thenReturn(connectionMock);
 
-        when(produtoRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
 
         movimentacaoService.registrarMovimentacao(movimentacao);
 
-        verify(produtoRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(45));
+        verify(produtoTransacionalRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(45));
 
         verify(movimentacaoRepository).registrarMovimentacao(any(Connection.class),eq(movimentacao));
 
@@ -150,11 +150,11 @@ public class MovimentacaoServiceTest {
 
         when(dataSource.getConnection()).thenReturn(connectionMock);
 
-        when(produtoRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class),eq(1))).thenReturn(produto);
 
         movimentacaoService.registrarMovimentacao(movimentacao);
 
-        verify(produtoRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(35));
+        verify(produtoTransacionalRepository).atualizarQuantidade(any(Connection.class),eq(1),eq(35));
 
         verify(movimentacaoRepository).registrarMovimentacao(any(Connection.class),eq(movimentacao));
 
@@ -172,11 +172,11 @@ public class MovimentacaoServiceTest {
         Connection connectionMock = mock(Connection.class);
 
         when(dataSource.getConnection()).thenReturn(connectionMock);
-        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
 
         movimentacaoService.registrarMovimentacao(movimentacao);
 
-        verify(produtoRepository).atualizarStatus(any(Connection.class), eq(1), eq(ATIVO));
+        verify(produtoTransacionalRepository).atualizarStatus(any(Connection.class), eq(1), eq(ATIVO));
     }
 
     @Test
@@ -190,10 +190,10 @@ public class MovimentacaoServiceTest {
         Connection connectionMock = mock(Connection.class);
 
         when(dataSource.getConnection()).thenReturn(connectionMock);
-        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
 
         movimentacaoService.registrarMovimentacao(movimentacaoMock);
-        verify(produtoRepository).atualizarStatus(any(Connection.class), eq(1), eq(StatusProduto.INATIVO));
+        verify(produtoTransacionalRepository).atualizarStatus(any(Connection.class), eq(1), eq(StatusProduto.INATIVO));
     }
 
     @Test
@@ -207,11 +207,11 @@ public class MovimentacaoServiceTest {
         Connection connectionMock = mock(Connection.class);
 
         when(dataSource.getConnection()).thenReturn(connectionMock);
-        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
 
         movimentacaoService.registrarMovimentacao(movimentacao);
 
-        verify(produtoRepository, never()).atualizarStatus(any(Connection.class), anyInt(), any(StatusProduto.class));
+        verify(produtoTransacionalRepository, never()).atualizarStatus(any(Connection.class), anyInt(), any(StatusProduto.class));
     }
 
     @Test
@@ -228,7 +228,7 @@ public class MovimentacaoServiceTest {
 
         Movimentacao movimentacao = new Movimentacao(1, TipoMovimentacao.SAIDA, 50);
 
-        when(produtoRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
+        when(produtoTransacionalRepository.buscar(any(Connection.class), eq(1))).thenReturn(produto);
 
         Connection connectionMock = mock(Connection.class);
         when(dataSource.getConnection()).thenReturn(connectionMock);

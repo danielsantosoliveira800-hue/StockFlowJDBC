@@ -1,6 +1,10 @@
 package dao;
 
 import db.ConnectionFactory;
+import domain.repository.ProdutoConsultaRepository;
+import domain.repository.ProdutoLoteRepository;
+import domain.repository.ProdutoRepository;
+import domain.repository.ProdutoTransacionalRepository;
 import exception.PersistenciaException;
 import domain.model.Produto;
 import domain.model.ProdutoRanking;
@@ -14,7 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ProdutoDAO implements ProdutoRepository {
+public class ProdutoDAO implements ProdutoRepository,
+        ProdutoConsultaRepository,
+        ProdutoLoteRepository,
+        ProdutoTransacionalRepository {
+
     private static final Logger logger = LoggerFactory.getLogger(ProdutoDAO.class);
 
     @Override
@@ -708,7 +716,7 @@ public class ProdutoDAO implements ProdutoRepository {
     }
 
     @Override
-    public void gerarSnapshotDasDashboard() {
+    public void gerarSnapshotDashboard() {
         String sql = "{call sp_snapshot_dashboard()}";
 
         try (

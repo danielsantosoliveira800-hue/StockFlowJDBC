@@ -2,7 +2,9 @@ package service;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import dao.ProdutoRepository;
+import domain.repository.ProdutoRepository;
+import domain.repository.ProdutoConsultaRepository;
+import domain.repository.ProdutoLoteRepository;
 import domain.model.*;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
@@ -27,6 +29,10 @@ public class ProdutoServiceTest {
     @Mock
     private ProdutoRepository produtoRepository;
     @Mock
+    private ProdutoConsultaRepository produtoConsultaRepository;
+    @Mock
+    private ProdutoLoteRepository produtoLoteRepository;
+    @Mock
     private MovimentacaoService movimentacaoService;
     @Mock
     private ProdutoValidator produtoValidator;
@@ -35,7 +41,13 @@ public class ProdutoServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        produtoService = new ProdutoService(movimentacaoService, produtoRepository, produtoValidator);
+        produtoService = new ProdutoService(
+                movimentacaoService,
+                produtoRepository,
+                produtoConsultaRepository,
+                produtoLoteRepository,
+                produtoValidator
+        );
     }
 
     @Test
@@ -48,16 +60,13 @@ public class ProdutoServiceTest {
         resumoMock.setQuantidadeTotalProdutos(3056);
         resumoMock.setValorTotalEstoque(860996.00);
 
-        when(produtoRepository.buscarResumoEstoque()).thenReturn(resumoMock);
+        when(produtoConsultaRepository.buscarResumoEstoque()).thenReturn(resumoMock);
 
         ResumoEstoque resultado = produtoService.buscarResumoEstoque();
 
-        // confira pelo menos 1 ou 2 campos com assertEquals
-        // e faça o verify no repository
-
         assertEquals(30, resultado.getProdutosInativos());
         assertEquals(970, resultado.getProdutosAtivos());
-        verify(produtoRepository).buscarResumoEstoque();
+        verify(produtoConsultaRepository).buscarResumoEstoque();
     }
 
     @Test
@@ -83,13 +92,13 @@ public class ProdutoServiceTest {
                 new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
         );
 
-        when(produtoRepository.buscarEstoqueBaixo()).thenReturn(estoqueBaixoMock);
+        when(produtoConsultaRepository.buscarEstoqueBaixo()).thenReturn(estoqueBaixoMock);
 
         List<Produto> resultado = produtoService.buscarEstoqueBaixo();
 
         assertEquals(1, resultado.size());
         assertEquals("Teclado", resultado.get(0).getNome());
-        verify(produtoRepository).buscarEstoqueBaixo();
+        verify(produtoConsultaRepository).buscarEstoqueBaixo();
     }
 
     @Test
@@ -99,13 +108,13 @@ public class ProdutoServiceTest {
                 new Produto("Teclado", 135.0, 50, StatusProduto.ATIVO)
         );
 
-        when(produtoRepository.buscarProdutosAtivos()).thenReturn(produtosAtivos);
+        when(produtoConsultaRepository.buscarProdutosAtivos()).thenReturn(produtosAtivos);
 
         List<Produto> resultado = produtoService.buscarEstoqueAtivo();
 
         assertEquals(1, resultado.size());
         assertEquals("Teclado", resultado.get(0).getNome());
-        verify(produtoRepository).buscarProdutosAtivos();
+        verify(produtoConsultaRepository).buscarProdutosAtivos();
     }
 
     @Test
@@ -115,13 +124,13 @@ public class ProdutoServiceTest {
                 new ProdutoRanking("Teclado", 12, 340)
         );
 
-        when(produtoRepository.buscarRankingProdutos()).thenReturn(rankingMock);
+        when(produtoConsultaRepository.buscarRankingProdutos()).thenReturn(rankingMock);
 
         List<ProdutoRanking> resultado = produtoService.buscarProdutoRanking();
 
         assertEquals(1, resultado.size());
         assertEquals("Teclado", resultado.get(0).getNomeProduto());
-        verify(produtoRepository).buscarRankingProdutos();
+        verify(produtoConsultaRepository).buscarRankingProdutos();
     }
 
     @Test
@@ -227,23 +236,23 @@ public class ProdutoServiceTest {
     @Test
     @DisplayName("deve retornar a quantidade de produtos.")
     void deveRetornarAQuantidadeDeProdutos() {
-        when(produtoRepository.contaProdutos()).thenReturn(10);
+        when(produtoConsultaRepository.contaProdutos()).thenReturn(10);
 
         int total = produtoService.contarProdutos();
 
         assertEquals(10, total);
-        verify(produtoRepository).contaProdutos();
+        verify(produtoConsultaRepository).contaProdutos();
     }
 
     @Test
     @DisplayName("Deve retornar o valor total em estoque.")
     void retornaOValorTotalNoEstoque() {
-        when(produtoRepository.calcularValorTotalEstoque()).thenReturn(10.0);
+        when(produtoConsultaRepository.calcularValorTotalEstoque()).thenReturn(10.0);
 
         double total = produtoService.calcularValorTotalEstoque();
 
         assertEquals(10.0, total);
-        verify(produtoRepository).calcularValorTotalEstoque();
+        verify(produtoConsultaRepository).calcularValorTotalEstoque();
     }
 
 
@@ -253,43 +262,43 @@ public class ProdutoServiceTest {
         Produto produto = new Produto("Fone", 70.00, 120, StatusProduto.ATIVO);
         produto.setId(1);
         when(produtoRepository.buscar(1)).thenReturn(produto);
-        when(produtoRepository.calcularValorProduto(1)).thenReturn(10.0);
+        when(produtoConsultaRepository.calcularValorProduto(1)).thenReturn(10.0);
 
         double total = produtoService.calcularValorProduto(1);
 
         assertEquals(10.0, total);
         verify(produtoRepository).buscar(1);
-        verify(produtoRepository).calcularValorProduto(1);
+        verify(produtoConsultaRepository).calcularValorProduto(1);
     }
 
     @Test
     @DisplayName("Deve retornar a quantidade total de produtos ativos.")
     void deveRetornarQuantidadeTotalDeProdutosAtivos() {
-        when(produtoRepository.contaProdutosAtivos()).thenReturn(10);
+        when(produtoConsultaRepository.contaProdutosAtivos()).thenReturn(10);
         int total = produtoService.contaProdutosAtivos();
 
         assertEquals(10, total);
-        verify(produtoRepository).contaProdutosAtivos();
+        verify(produtoConsultaRepository).contaProdutosAtivos();
     }
 
     @Test
     @DisplayName("Deve retornar a quantidade total de produtos inativos.")
     void deveRetornarQuantidadeTotalDeProdutosInativos() {
-        when(produtoRepository.contaProdutosInativos()).thenReturn(10);
+        when(produtoConsultaRepository.contaProdutosInativos()).thenReturn(10);
         int total = produtoService.contaProdutosInativos();
 
         assertEquals(10, total);
-        verify(produtoRepository).contaProdutosInativos();
+        verify(produtoConsultaRepository).contaProdutosInativos();
     }
 
     @Test
     @DisplayName("Deve retornar a soma total das quantidades de produtos.")
     void deveRetornarASomaTotalDeProdutos() {
-        when(produtoRepository.quantidadeTotalProdutos()).thenReturn(10);
+        when(produtoConsultaRepository.quantidadeTotalProdutos()).thenReturn(10);
         int total = produtoService.somaQuantidadeProdutos();
 
         assertEquals(10, total);
-        verify(produtoRepository).quantidadeTotalProdutos();
+        verify(produtoConsultaRepository).quantidadeTotalProdutos();
     }
 
     @Test
@@ -298,7 +307,7 @@ public class ProdutoServiceTest {
         ArgumentCaptor<List<Produto>> captor = ArgumentCaptor.forClass(List.class);
 
         produtoService.inserirProdutosEmLote(200);
-        verify(produtoRepository).inserirProdutoEmLote(captor.capture());
+        verify(produtoLoteRepository).inserirProdutoEmLote(captor.capture());
 
         List<Produto> produtosCapturados = captor.getValue();
 
@@ -314,7 +323,7 @@ public class ProdutoServiceTest {
         );
 
         produtoService.inserirProdutosComSavepoint(produtos);
-        verify(produtoRepository).inserirProdutosComSavepoint(produtos);
+        verify(produtoLoteRepository).inserirProdutosComSavepoint(produtos);
     }
 
     @Test

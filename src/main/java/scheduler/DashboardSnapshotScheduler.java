@@ -1,6 +1,6 @@
 package scheduler;
 
-import dao.ProdutoRepository;
+import domain.repository.ProdutoConsultaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,18 +12,18 @@ public class DashboardSnapshotScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(DashboardSnapshotScheduler.class);
 
-    private final ProdutoRepository produtoRepository;
+    private final ProdutoConsultaRepository produtoConsultaRepository;
     private final ScheduledExecutorService executor;
 
-    public DashboardSnapshotScheduler(ProdutoRepository produtoRepository) {
-        this.produtoRepository = produtoRepository;
+    public DashboardSnapshotScheduler(ProdutoConsultaRepository produtoConsultaRepository){
+        this.produtoConsultaRepository = produtoConsultaRepository;
         this.executor = Executors.newSingleThreadScheduledExecutor();
     }
 
     public void iniciar(long intervaloEmMinutos){
         executor.scheduleAtFixedRate(()-> {
             try {
-                produtoRepository.gerarSnapshotDasDashboard();
+                produtoConsultaRepository.gerarSnapshotDashboard();
             } catch (Exception e) {
                 logger.error("Erro ao gerar snapshot agendado do dashboard.", e);
             }

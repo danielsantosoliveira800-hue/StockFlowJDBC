@@ -3,7 +3,6 @@ package service;
 import dao.MovimentacaoDAO;
 import domain.repository.MovimentacaoRepository;
 import dao.ProdutoDAO;
-import dao.ProdutoRepository;
 import db.ConnectionFactory;
 import exception.PersistenciaException;
 import exception.TipoMovimentacaoInvalidaException;
@@ -11,6 +10,7 @@ import domain.model.Movimentacao;
 import domain.model.Produto;
 import domain.model.StatusProduto;
 import domain.model.TipoMovimentacao;
+import domain.repository.ProdutoTransacionalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import domain.MovimentacaoValidator;
@@ -26,7 +26,7 @@ public class MovimentacaoService {
     private static final TipoMovimentacao ENTRADA = TipoMovimentacao.ENTRADA;
     private static final TipoMovimentacao SAIDA = TipoMovimentacao.SAIDA;
     private final MovimentacaoRepository movimentacaoRepository;
-    private final ProdutoRepository produtoRepository;
+    private final ProdutoTransacionalRepository produtoTransacionalRepository;
     private final MovimentacaoValidator movimentacaoValidator;
     private final DataSource dataSource;
     private static final Logger transactionLogger = LoggerFactory.getLogger("TRANSACTION");
@@ -37,12 +37,12 @@ public class MovimentacaoService {
     }
 
     public MovimentacaoService(MovimentacaoRepository movimentacaoRepository,
-                               ProdutoRepository produtoRepository,
+                               ProdutoTransacionalRepository produtoTransacionalRepository,
                                MovimentacaoValidator movimentacaoValidator,
                                DataSource dataSource) {
 
         this.movimentacaoRepository = movimentacaoRepository;
-        this.produtoRepository = produtoRepository;
+        this.produtoTransacionalRepository = produtoTransacionalRepository;
         this.movimentacaoValidator = movimentacaoValidator;
         this.dataSource = dataSource;
     }
@@ -63,13 +63,13 @@ public class MovimentacaoService {
 
                 int novaQuantidade = calcularNovaQuantidade(produto,movimentacao);
 
-                produtoRepository.atualizarQuantidade(connection, produto.getId(), novaQuantidade);
+                produtoTransacionalRepository.atualizarQuantidade(connection, produto.getId(), novaQuantidade);
 
                 if (!produto.isDesativadoManualmente()){
                     StatusProduto novoStatus =
                             novaQuantidade == 0 ? StatusProduto.INATIVO : StatusProduto.ATIVO;
 
-                    produtoRepository.atualizarStatus(connection, produto.getId(), novoStatus);
+                    produtoTransacionalRepository.atualizarStatus(connection, produto.getId(), novoStatus);
                 }
 
                 movimentacaoRepository.registrarMovimentacao(connection, movimentacao);
@@ -111,7 +111,7 @@ public class MovimentacaoService {
 
     private Produto buscarProduto(Connection connection, int id){
 
-        Produto produto = produtoRepository.buscar(connection, id);
+        Produto produto = produtoTransacionalRepository.buscar(connection, id);
 
         movimentacaoValidator.validarProduto(produto);
 

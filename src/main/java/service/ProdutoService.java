@@ -1,7 +1,9 @@
 package service;
 import dao.ProdutoDAO;
-import dao.ProdutoRepository;
+import domain.repository.ProdutoRepository;
 import domain.model.*;
+import domain.repository.ProdutoConsultaRepository;
+import domain.repository.ProdutoLoteRepository;
 import exception.ProdutoNaoEncontradoException;
 import exception.ValidacaoException;
 import org.slf4j.Logger;
@@ -16,6 +18,8 @@ public class ProdutoService {
     private final MovimentacaoService movimentacaoService;
     private final ProdutoValidator produtoValidator;
     private final ProdutoRepository produtoRepository;
+    private final ProdutoConsultaRepository produtoConsultaRepository;
+    private final ProdutoLoteRepository produtoLoteRepository;
     private static final Logger auditLogger = LoggerFactory.getLogger("AUDIT");
 
     public ProdutoService() {
@@ -23,11 +27,21 @@ public class ProdutoService {
     }
 
     public ProdutoService(MovimentacaoService movimentacaoService,
+                          ProdutoDAO produtoDAO,
+                          ProdutoValidator produtoValidator) {
+        this(movimentacaoService, produtoDAO, produtoDAO, produtoDAO, produtoValidator);
+    }
+
+    public ProdutoService(MovimentacaoService movimentacaoService,
                           ProdutoRepository produtoRepository,
-                          ProdutoValidator produtoValidator)
-    {
+                          ProdutoConsultaRepository produtoConsultaRepository,
+                          ProdutoLoteRepository produtoLoteRepository,
+                          ProdutoValidator produtoValidator) {
+
         this.movimentacaoService = movimentacaoService;
         this.produtoRepository = produtoRepository;
+        this.produtoConsultaRepository = produtoConsultaRepository;
+        this.produtoLoteRepository = produtoLoteRepository;
         this.produtoValidator = produtoValidator;
     }
 
@@ -100,35 +114,35 @@ public class ProdutoService {
     }
 
     public List<Produto> buscarEstoqueBaixo(){
-        return produtoRepository.buscarEstoqueBaixo();
+        return produtoConsultaRepository.buscarEstoqueBaixo();
     }
 
     public List<Produto> buscarEstoqueAtivo(){
-        return produtoRepository.buscarProdutosAtivos();
+        return produtoConsultaRepository.buscarProdutosAtivos();
     }
 
     public double calcularValorTotalEstoque(){
-        return produtoRepository.calcularValorTotalEstoque();
+        return produtoConsultaRepository.calcularValorTotalEstoque();
     }
 
     public int contarProdutos(){
-        return produtoRepository.contaProdutos();
+        return produtoConsultaRepository.contaProdutos();
     }
 
     public int contaProdutosAtivos(){
-        return produtoRepository.contaProdutosAtivos();
+        return produtoConsultaRepository.contaProdutosAtivos();
     }
 
     public int contaProdutosInativos(){
-       return produtoRepository.contaProdutosInativos();
+       return produtoConsultaRepository.contaProdutosInativos();
     }
 
     public int somaQuantidadeProdutos(){
-        return produtoRepository.quantidadeTotalProdutos();
+        return produtoConsultaRepository.quantidadeTotalProdutos();
     }
 
     public List<ProdutoRanking> buscarProdutoRanking(){
-        return produtoRepository.buscarRankingProdutos();
+        return produtoConsultaRepository.buscarRankingProdutos();
     }
 
     private Produto buscarProduto(int id){
@@ -159,14 +173,14 @@ public class ProdutoService {
 
 
     public ResumoEstoque buscarResumoEstoque(){
-        return produtoRepository.buscarResumoEstoque();
+        return produtoConsultaRepository.buscarResumoEstoque();
     }
 
     public double calcularValorProduto(int id){
 
         buscarProduto(id);
 
-        return produtoRepository.calcularValorProduto(id);
+        return produtoConsultaRepository.calcularValorProduto(id);
     }
 
     public void inserirProdutosEmLote(int quantidade){
@@ -183,11 +197,11 @@ public class ProdutoService {
                     )
             );
         }
-        produtoRepository.inserirProdutoEmLote(produtos);
+        produtoLoteRepository.inserirProdutoEmLote(produtos);
     }
 
     public void inserirProdutosComSavepoint(List<Produto> produtos){
-        produtoRepository.inserirProdutosComSavepoint(produtos);
+        produtoLoteRepository.inserirProdutosComSavepoint(produtos);
     }
 
     public void testarSavepoint(){

@@ -4,7 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import dao.MovimentacaoRepository;
+import domain.repository.MovimentacaoRepository;
 import dao.ProdutoRepository;
 import exception.EstoqueInsuficienteException;
 import domain.model.Movimentacao;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
-import validation.MovimentacaoValidator;
+import domain.MovimentacaoValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

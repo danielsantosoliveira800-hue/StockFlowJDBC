@@ -13,7 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
-import validation.ProdutoValidator;
+import domain.ProdutoValidator;
 import ch.qos.logback.classic.Logger;
 
 import java.util.List;

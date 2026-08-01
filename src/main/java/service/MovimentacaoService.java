@@ -1,7 +1,7 @@
 package service;
 
 import dao.MovimentacaoDAO;
-import dao.MovimentacaoRepository;
+import domain.repository.MovimentacaoRepository;
 import dao.ProdutoDAO;
 import dao.ProdutoRepository;
 import db.ConnectionFactory;
@@ -13,7 +13,7 @@ import domain.model.StatusProduto;
 import domain.model.TipoMovimentacao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import validation.MovimentacaoValidator;
+import domain.MovimentacaoValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

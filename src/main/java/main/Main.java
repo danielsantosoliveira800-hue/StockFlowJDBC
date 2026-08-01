@@ -8,8 +8,8 @@ import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;
 import ui.Menu;
-import validation.MovimentacaoValidator;
-import validation.ProdutoValidator;
+import domain.MovimentacaoValidator;
+import domain.ProdutoValidator;
 
 public class Main {
     public static void main(String[] args) {

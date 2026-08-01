@@ -9,7 +9,7 @@ import domain.model.Produto;
 import domain.model.StatusProduto;
 import domain.model.TipoMovimentacao;
 import org.junit.jupiter.api.Test;
-import validation.MovimentacaoValidator;
+import domain.MovimentacaoValidator;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;

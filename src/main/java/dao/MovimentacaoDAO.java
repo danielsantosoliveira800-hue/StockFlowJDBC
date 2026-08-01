@@ -1,5 +1,6 @@
 package dao;
 import db.ConnectionFactory;
+import domain.repository.MovimentacaoRepository;
 import exception.PersistenciaException;
 import domain.model.Movimentacao;
 import domain.model.TipoMovimentacao;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovimentacaoDAO implements MovimentacaoRepository{
+public class MovimentacaoDAO implements MovimentacaoRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(MovimentacaoDAO.class);
 

@@ -1,4 +1,4 @@
-package validation;
+package domain;
 
 import exception.EstoqueInsuficienteException;
 import exception.ProdutoNaoEncontradoException;

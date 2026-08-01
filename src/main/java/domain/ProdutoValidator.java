@@ -1,4 +1,4 @@
-package validation;
+package domain;
 
 import exception.ValidacaoException;
 import domain.model.Produto;

@@ -13,6 +13,7 @@ import domain.model.StatusProduto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,15 @@ public class ProdutoDAO implements ProdutoRepository,
         ProdutoTransacionalRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(ProdutoDAO.class);
+    private final DataSource dataSource;
+
+    public ProdutoDAO(){
+        this(ConnectionFactory.getDataSource());
+    }
+
+    public ProdutoDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public void salvarProduto(Produto produto) {
@@ -35,7 +45,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -62,7 +72,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -95,7 +105,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql)
@@ -122,7 +132,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -167,7 +177,7 @@ public class ProdutoDAO implements ProdutoRepository,
         String sql = "SELECT * FROM produtos WHERE id = ?";
 
         try (
-                Connection connection = ConnectionFactory.getConnection();
+                Connection connection = dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)
         ) {
 
@@ -196,7 +206,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql)
@@ -251,7 +261,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -281,7 +291,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -310,7 +320,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -351,7 +361,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -380,7 +390,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -408,7 +418,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -437,7 +447,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -464,7 +474,7 @@ public class ProdutoDAO implements ProdutoRepository,
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -495,7 +505,7 @@ public class ProdutoDAO implements ProdutoRepository,
         String sql = "{CALL sp_resumo_estoque()}";
 
         try (
-                Connection connection = ConnectionFactory.getConnection();
+                Connection connection = dataSource.getConnection();
                 CallableStatement statement = connection.prepareCall(sql);
                 ResultSet rs = statement.executeQuery();
         ) {
@@ -526,7 +536,7 @@ public class ProdutoDAO implements ProdutoRepository,
         String sql = "{ ? =  call fn_calcular_valor_produto(?) }";
 
         try (
-                Connection connection = ConnectionFactory.getConnection();
+                Connection connection = dataSource.getConnection();
 
                 CallableStatement statement = connection.prepareCall(sql);
 
@@ -557,7 +567,7 @@ public class ProdutoDAO implements ProdutoRepository,
         PreparedStatement statement = null;
 
         try {
-            connection = ConnectionFactory.getConnection();
+            connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(sql);
 
@@ -607,7 +617,7 @@ public class ProdutoDAO implements ProdutoRepository,
         Savepoint savepoint = null;
         try {
 
-            connection = ConnectionFactory.getConnection();
+            connection = dataSource.getConnection();
             connection.setAutoCommit(false);
 
             logger.info("Iniciando transação de inserção com savepoint. Total de produtos: {}", produtos.size());
@@ -677,7 +687,7 @@ public class ProdutoDAO implements ProdutoRepository,
                 """;
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
@@ -720,7 +730,7 @@ public class ProdutoDAO implements ProdutoRepository,
         String sql = "{call sp_snapshot_dashboard()}";
 
         try (
-                Connection connection = ConnectionFactory.getConnection();
+                Connection connection = dataSource.getConnection();
                 CallableStatement statement = connection.prepareCall(sql);
 
                 ){

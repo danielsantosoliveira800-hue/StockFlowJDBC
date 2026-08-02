@@ -7,6 +7,7 @@ import domain.model.TipoMovimentacao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,6 +16,15 @@ import java.util.List;
 public class MovimentacaoDAO implements MovimentacaoRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(MovimentacaoDAO.class);
+    private final DataSource dataSource;
+
+    public MovimentacaoDAO(){
+        this(ConnectionFactory.getDataSource());
+    }
+
+    public MovimentacaoDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public void registrarMovimentacao(Connection connection, Movimentacao movimentacao){
@@ -65,7 +75,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository {
                 "SELECT * FROM vw_historico_movimentacoes";
 
         try (
-                Connection connection = ConnectionFactory.getConnection();
+                Connection connection = dataSource.getConnection();
 
                 PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -102,7 +112,7 @@ public class MovimentacaoDAO implements MovimentacaoRepository {
                 "on m.produto_id = p.id " +
                 "WHERE m.data_movimentacao >= ? AND m.data_movimentacao < ?";
 
-        try (Connection connection = ConnectionFactory.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql))
         {
             statement.setDate(1, Date.valueOf(dataInicio));

@@ -4,6 +4,7 @@ import db.ConnectionFactory;
 import exception.PersistenciaException;
 import domain.model.AuditoriaProdutos;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuditoriaProdutosDAO implements AuditoriaProdutosRepository {
+
+    private final DataSource dataSource;
+
+    public AuditoriaProdutosDAO() {
+        this(ConnectionFactory.getDataSource());
+    }
+
+    public AuditoriaProdutosDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public List<AuditoriaProdutos> listar() {
@@ -23,7 +34,7 @@ public class AuditoriaProdutosDAO implements AuditoriaProdutosRepository {
 
         try (
                 Connection connection =
-                        ConnectionFactory.getConnection();
+                        dataSource.getConnection();
 
                 PreparedStatement statement
                         = connection.prepareStatement(sql);

@@ -1,9 +1,9 @@
-package infrasctructure.persistence;
+package infrastructure.persistence;
 
 import dao.AuditoriaProdutosRepository;
 import exception.PersistenciaException;
 import domain.model.AuditoriaProdutos;
-import infrasctructure.ConnectionFactory;
+import infrastructure.ConnectionFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

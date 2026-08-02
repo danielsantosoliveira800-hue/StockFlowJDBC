@@ -1,9 +1,9 @@
-package infrasctructure.persistence;
+package infrastructure.persistence;
 import domain.repository.MovimentacaoRepository;
 import exception.PersistenciaException;
 import domain.model.Movimentacao;
 import domain.model.TipoMovimentacao;
-import infrasctructure.ConnectionFactory;
+import infrastructure.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

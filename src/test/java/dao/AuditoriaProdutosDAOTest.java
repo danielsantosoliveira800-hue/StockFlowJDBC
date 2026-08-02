@@ -1,8 +1,8 @@
 package dao;
 
-import infrasctructure.persistence.AuditoriaProdutosDAO;
-import infrasctructure.ConnectionFactory;
-import infrasctructure.persistence.ProdutoDAO;
+import infrastructure.persistence.AuditoriaProdutosDAO;
+import infrastructure.ConnectionFactory;
+import infrastructure.persistence.ProdutoDAO;
 import integration.IntegrationTestBase;
 import domain.model.AuditoriaProdutos;
 import domain.model.Produto;

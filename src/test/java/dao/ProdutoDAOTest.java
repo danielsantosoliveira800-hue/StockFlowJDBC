@@ -1,9 +1,9 @@
 package dao;
 
-import infrasctructure.ConnectionFactory;
+import infrastructure.ConnectionFactory;
 import domain.model.*;
-import infrasctructure.persistence.MovimentacaoDAO;
-import infrasctructure.persistence.ProdutoDAO;
+import infrastructure.persistence.MovimentacaoDAO;
+import infrastructure.persistence.ProdutoDAO;
 import integration.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 

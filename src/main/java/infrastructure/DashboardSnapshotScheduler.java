@@ -1,4 +1,4 @@
-package infrasctructure;
+package infrastructure;
 
 import domain.repository.ProdutoConsultaRepository;
 import org.slf4j.Logger;

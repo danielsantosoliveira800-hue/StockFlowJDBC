@@ -1,4 +1,4 @@
-package infrasctructure.persistence;
+package infrastructure.persistence;
 
 import domain.repository.ProdutoConsultaRepository;
 import domain.repository.ProdutoLoteRepository;
@@ -9,7 +9,7 @@ import domain.model.Produto;
 import domain.model.ProdutoRanking;
 import domain.model.ResumoEstoque;
 import domain.model.StatusProduto;
-import infrasctructure.ConnectionFactory;
+import infrastructure.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

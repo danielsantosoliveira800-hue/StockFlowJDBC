@@ -1,6 +1,6 @@
 package service;
 
-import infrasctructure.persistence.AuditoriaProdutosDAO;
+import infrastructure.persistence.AuditoriaProdutosDAO;
 import dao.AuditoriaProdutosRepository;
 import domain.model.AuditoriaProdutos;
 

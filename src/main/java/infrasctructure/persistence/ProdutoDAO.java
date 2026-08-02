@@ -1,6 +1,5 @@
-package dao;
+package infrasctructure.persistence;
 
-import db.ConnectionFactory;
 import domain.repository.ProdutoConsultaRepository;
 import domain.repository.ProdutoLoteRepository;
 import domain.repository.ProdutoRepository;
@@ -10,6 +9,7 @@ import domain.model.Produto;
 import domain.model.ProdutoRanking;
 import domain.model.ResumoEstoque;
 import domain.model.StatusProduto;
+import infrasctructure.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

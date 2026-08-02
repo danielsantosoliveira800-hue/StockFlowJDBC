@@ -1,5 +1,5 @@
 package service;
-import dao.ProdutoDAO;
+import infrasctructure.persistence.ProdutoDAO;
 import domain.repository.ProdutoRepository;
 import domain.model.*;
 import domain.repository.ProdutoConsultaRepository;

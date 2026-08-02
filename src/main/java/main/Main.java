@@ -1,9 +1,9 @@
 package main;
 
-import dao.MovimentacaoDAO;
-import dao.ProdutoDAO;
-import db.ConnectionFactory;
-import scheduler.DashboardSnapshotScheduler;
+import infrasctructure.persistence.MovimentacaoDAO;
+import infrasctructure.persistence.ProdutoDAO;
+import infrasctructure.ConnectionFactory;
+import infrasctructure.DashboardSnapshotScheduler;
 import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;

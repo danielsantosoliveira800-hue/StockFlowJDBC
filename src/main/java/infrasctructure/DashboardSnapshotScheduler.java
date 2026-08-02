@@ -1,4 +1,4 @@
-package scheduler;
+package infrasctructure;
 
 import domain.repository.ProdutoConsultaRepository;
 import org.slf4j.Logger;

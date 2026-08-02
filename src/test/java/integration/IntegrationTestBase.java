@@ -1,6 +1,6 @@
 package integration;
 
-import db.ConnectionFactory;
+import infrasctructure.ConnectionFactory;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.sql.Connection;

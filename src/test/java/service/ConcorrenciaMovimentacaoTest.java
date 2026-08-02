@@ -1,8 +1,8 @@
 package service;
 
-import dao.MovimentacaoDAO;
-import dao.ProdutoDAO;
-import db.ConnectionFactory;
+import infrasctructure.persistence.MovimentacaoDAO;
+import infrasctructure.persistence.ProdutoDAO;
+import infrasctructure.ConnectionFactory;
 import integration.IntegrationTestBase;
 import domain.model.Movimentacao;
 import domain.model.Produto;

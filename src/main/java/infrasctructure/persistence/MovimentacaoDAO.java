@@ -1,9 +1,9 @@
-package dao;
-import db.ConnectionFactory;
+package infrasctructure.persistence;
 import domain.repository.MovimentacaoRepository;
 import exception.PersistenciaException;
 import domain.model.Movimentacao;
 import domain.model.TipoMovimentacao;
+import infrasctructure.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

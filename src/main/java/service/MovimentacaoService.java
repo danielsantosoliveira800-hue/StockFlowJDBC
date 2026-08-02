@@ -1,9 +1,9 @@
 package service;
 
-import dao.MovimentacaoDAO;
+import infrasctructure.persistence.MovimentacaoDAO;
 import domain.repository.MovimentacaoRepository;
-import dao.ProdutoDAO;
-import db.ConnectionFactory;
+import infrasctructure.persistence.ProdutoDAO;
+import infrasctructure.ConnectionFactory;
 import exception.PersistenciaException;
 import exception.TipoMovimentacaoInvalidaException;
 import domain.model.Movimentacao;

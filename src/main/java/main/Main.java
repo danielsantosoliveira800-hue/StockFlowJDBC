@@ -7,6 +7,8 @@ import infrastructure.DashboardSnapshotScheduler;
 import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;
+import service.ProdutoRelatorioService;
+import service.ProdutoLoteService;
 import ui.Menu;
 import domain.MovimentacaoValidator;
 import domain.ProdutoValidator;
@@ -23,16 +25,18 @@ public class Main {
         scheduler.iniciar(30);
 
         MovimentacaoService movimentacaoService = new MovimentacaoService
-                                                                (movimentacaoDAO,
-                                                                produtoDAO,
-                                                                movimentacaoValidator,
-                                                                ConnectionFactory.getDataSource());
+                (movimentacaoDAO,
+                        produtoDAO,
+                        movimentacaoValidator,
+                        ConnectionFactory.getDataSource());
 
         ProdutoValidator produtoValidator = new ProdutoValidator();
 
         ProdutoService produtoService = new ProdutoService(movimentacaoService, produtoDAO, produtoValidator);
+        ProdutoRelatorioService produtoRelatorioService = new ProdutoRelatorioService(produtoDAO, produtoDAO);
+        ProdutoLoteService produtoLoteService = new ProdutoLoteService(produtoDAO);
 
-        Menu menu = new Menu(produtoService, movimentacaoService, auditoriaProdutoService);
+        Menu menu = new Menu(produtoService, produtoRelatorioService, produtoLoteService, movimentacaoService, auditoriaProdutoService);
 
         menu.exibir();
         scheduler.parar();

@@ -1,9 +1,7 @@
 package ui;
 
 import domain.model.*;
-import service.MovimentacaoService;
-import service.AuditoriaProdutoService;
-import service.ProdutoService;
+import service.*;
 import util.CsvExporter;
 
 import java.time.LocalDate;
@@ -14,16 +12,22 @@ import java.util.Scanner;
 import java.util.InputMismatchException;
 
 public class Menu {
-    private Scanner sc = new Scanner(System.in);
 
-    private final AuditoriaProdutoService auditoriaProdutoService;
+    private Scanner sc = new Scanner(System.in);
     private final ProdutoService produtoService;
+    private final ProdutoRelatorioService produtoRelatorioService;
+    private final ProdutoLoteService produtoLoteService;
     private final MovimentacaoService movimentacaoService;
+    private final AuditoriaProdutoService auditoriaProdutoService;
 
     public Menu(ProdutoService produtoService,
+                ProdutoRelatorioService produtoRelatorioService,
+                ProdutoLoteService produtoLoteService,
                 MovimentacaoService movimentacaoService,
                 AuditoriaProdutoService auditoriaProdutoService) {
         this.produtoService = produtoService;
+        this.produtoRelatorioService = produtoRelatorioService;
+        this.produtoLoteService = produtoLoteService;
         this.movimentacaoService = movimentacaoService;
         this.auditoriaProdutoService = auditoriaProdutoService;
     }
@@ -123,7 +127,7 @@ public class Menu {
                     inserirProdutosEmLote();
                 }
                 case 20 ->{
-                    produtoService.testarSavepoint();
+                    produtoLoteService.testarSavepoint();
                     break;
                 }
                 case 21->{
@@ -142,7 +146,7 @@ public class Menu {
 
         long inicio = System.currentTimeMillis();
 
-        produtoService.inserirProdutosEmLote(quantidade);
+        produtoLoteService.inserirProdutosEmLote(quantidade);
 
         long fim = System.currentTimeMillis();
 
@@ -155,7 +159,7 @@ public class Menu {
 
         int id = lerInteiro();
 
-        double valor = produtoService.calcularValorProduto(id);
+        double valor = produtoRelatorioService.calcularValorProduto(id);
 
         System.out.printf("Valor total do produto em estoque: R$ %.2f%n", valor);
 
@@ -396,7 +400,7 @@ public class Menu {
     private void listarEstoqueBaixo(){
 
         List<Produto> produtos =
-                produtoService.buscarEstoqueBaixo();
+                produtoRelatorioService.buscarEstoqueBaixo();
 
         if (produtos.isEmpty()){
             System.out.println("Nenhum produto com estoque baixo.");
@@ -418,7 +422,7 @@ public class Menu {
     }
 
     private void listarProdutosAtivos(){
-        List<Produto> produtos = produtoService.buscarEstoqueAtivo();
+        List<Produto> produtos = produtoRelatorioService.buscarEstoqueAtivo();
 
         if (produtos.isEmpty()){
             System.out.println("Nenhum produto ativo.");
@@ -440,7 +444,7 @@ public class Menu {
     }
 
     private void exibirValorTotalEstoque(){
-        double total = produtoService.calcularValorTotalEstoque();
+        double total = produtoRelatorioService.calcularValorTotalEstoque();
 
         System.out.println("\n === VALOR TOTAL DO ESTOQUE === ");
         System.out.printf("R$ %.2f%n", total);
@@ -448,9 +452,9 @@ public class Menu {
 
     private void exibirDashboard(){
 
-        ResumoEstoque resumoEstoque = produtoService.buscarResumoEstoque();
+        ResumoEstoque resumoEstoque = produtoRelatorioService.buscarResumoEstoque();
 
-        List<Produto> estoqueBaixo = produtoService.buscarEstoqueBaixo();
+        List<Produto> estoqueBaixo = produtoRelatorioService.buscarEstoqueBaixo();
 
         System.out.println("\n === TOTAL DE PRODUTOS === ");
         System.out.println("Produtos cadastrados: "+ resumoEstoque.getTotalProdutos());
@@ -536,7 +540,7 @@ public class Menu {
     }
 
     private void exibirProdutoRanking(){
-        List<ProdutoRanking> rankingDeProdutos = produtoService.buscarProdutoRanking();
+        List<ProdutoRanking> rankingDeProdutos = produtoRelatorioService.buscarProdutoRanking();
 
         if (rankingDeProdutos.isEmpty()){
             System.out.println("Lista de ranking vazia.");
@@ -560,7 +564,7 @@ public class Menu {
     }
 
     private void exportarCSV(){
-        List<ProdutoRanking> ranking = produtoService.buscarProdutoRanking();
+        List<ProdutoRanking> ranking = produtoRelatorioService.buscarProdutoRanking();
 
         CsvExporter csvExporter = new CsvExporter();
 

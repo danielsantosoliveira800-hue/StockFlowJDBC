@@ -4,12 +4,13 @@ import infrastructure.persistence.MovimentacaoDAO;
 import infrastructure.persistence.ProdutoDAO;
 import infrastructure.ConnectionFactory;
 import infrastructure.DashboardSnapshotScheduler;
+import presentation.Menu;
 import service.AuditoriaProdutoService;
 import service.MovimentacaoService;
 import service.ProdutoService;
 import service.ProdutoRelatorioService;
 import service.ProdutoLoteService;
-import ui.Menu;
+import presentation.Menu;
 import domain.MovimentacaoValidator;
 import domain.ProdutoValidator;
 

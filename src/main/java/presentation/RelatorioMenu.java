@@ -5,6 +5,7 @@ import domain.model.ProdutoRanking;
 import domain.model.ResumoEstoque;
 import service.ProdutoRelatorioService;
 import util.CsvExporter;
+import util.FormatadorUtil;
 
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class RelatorioMenu {
         for (Produto produto : produtos) {
             System.out.println("ID: "+produto.getId());
             System.out.println("Nome: "+produto.getNome());
-            System.out.println("Preço: R$"+produto.getPreco());
+            System.out.println("Preço: R$"+ FormatadorUtil.formatadorMoeda(produto.getPreco()));
             System.out.println("Quantidade: "+produto.getQuantidade());
             System.out.println("Status: "+produto.getStatus());
             System.out.println("------------------------------------");
@@ -84,7 +85,7 @@ public class RelatorioMenu {
         for (Produto produto : produtos) {
             System.out.println("ID: "+produto.getId());
             System.out.println("Nome: "+produto.getNome());
-            System.out.println("Preço: R$"+produto.getPreco());
+            System.out.println("Preço: R$"+FormatadorUtil.formatadorMoeda(produto.getPreco()));
             System.out.println("Quantidade: "+produto.getQuantidade());
             System.out.println("Status: "+produto.getStatus());
             System.out.println("------------------------------------");
@@ -95,7 +96,7 @@ public class RelatorioMenu {
         double total = produtoRelatorioService.calcularValorTotalEstoque();
 
         System.out.println("\n === VALOR TOTAL DO ESTOQUE === ");
-        System.out.printf("R$ %.2f%n", total);
+        System.out.println(FormatadorUtil.formatadorMoeda(total));
     }
 
     private void exibirDashboard(){
@@ -115,7 +116,7 @@ public class RelatorioMenu {
         System.out.println("Quantidade total: "+ resumoEstoque.getQuantidadeTotalProdutos());
 
         System.out.println("\n === VALOR TOTAL DO ESTOQUE === ");
-        System.out.printf("Valor: R$ %.2f%n",resumoEstoque.getValorTotalEstoque());
+        System.out.println("Valor: "+ FormatadorUtil.formatadorMoeda(resumoEstoque.getValorTotalEstoque()));
 
         System.out.println("\n === PRODUTOS COM ESTOQUE BAIXO === ");
         if (estoqueBaixo.isEmpty()){
@@ -154,7 +155,7 @@ public class RelatorioMenu {
 
         double valor = produtoRelatorioService.calcularValorProduto(id);
 
-        System.out.printf("Valor total do produto em estoque: R$ %.2f%n", valor);
+        System.out.println("Valor total do produto em estoque: "+ FormatadorUtil.formatadorMoeda(valor));
     }
 
     private void exportarCSV(){

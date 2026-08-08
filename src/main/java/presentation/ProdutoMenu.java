@@ -3,6 +3,7 @@ package presentation;
 import domain.model.Produto;
 import domain.model.StatusProduto;
 import service.ProdutoService;
+import util.FormatadorUtil;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class ProdutoMenu {
         for (Produto produto : produtos) {
             System.out.println("ID: "+produto.getId());
             System.out.println("Nome: "+produto.getNome());
-            System.out.println("Preço: R$"+produto.getPreco());
+            System.out.println("Preço: R$"+ FormatadorUtil.formatadorMoeda(produto.getPreco()));
             System.out.println("Quantidade: "+produto.getQuantidade());
             System.out.println("Status: "+produto.getStatus());
             System.out.println("------------------------------------");
@@ -137,7 +138,7 @@ public class ProdutoMenu {
             System.out.println("\n ===PRODUTO ENCONTRADO===");
             System.out.println("ID: " + produto.getId());
             System.out.println("Nome: " + produto.getNome());
-            System.out.println("Preço: " + produto.getPreco());
+            System.out.println("Preço: " + FormatadorUtil.formatadorMoeda(produto.getPreco()));
             System.out.println("Quantidade: " + produto.getQuantidade());
             System.out.println("Status: " + produto.getStatus());
         } else {
@@ -161,7 +162,7 @@ public class ProdutoMenu {
         for (Produto produto : produtos) {
             System.out.println("ID: "+produto.getId());
             System.out.println("Nome: "+produto.getNome());
-            System.out.println("Preço: R$"+produto.getPreco());
+            System.out.println("Preço: R$"+FormatadorUtil.formatadorMoeda(produto.getPreco()));
             System.out.println("Quantidade: "+produto.getQuantidade());
             System.out.println("Status: "+produto.getStatus());
             System.out.println("------------------------------------");

@@ -2,6 +2,7 @@ package presentation;
 
 import domain.model.AuditoriaProdutos;
 import service.AuditoriaProdutoService;
+import util.FormatadorUtil;
 
 import java.util.List;
 
@@ -27,8 +28,8 @@ public class AuditoriaMenu {
             System.out.println("Produto id: "+ auditoria.getProdutoId());
             System.out.println("Nome antigo: "+ auditoria.getNomeAntigo());
             System.out.println("Nome novo: "+ auditoria.getNomeNovo());
-            System.out.println("Preço antigo: R$ "+ auditoria.getPrecoAntigo());
-            System.out.println("Preço novo: R$ "+ auditoria.getPrecoNovo());
+            System.out.println("Preço antigo: R$ "+ FormatadorUtil.formatadorMoeda(auditoria.getPrecoAntigo()));
+            System.out.println("Preço novo: R$ "+ FormatadorUtil.formatadorMoeda(auditoria.getPrecoNovo()));
             System.out.println("Quantidade antiga: "+ auditoria.getQuantidadeAntiga());
             System.out.println("Quantidade novo: "+ auditoria.getQuantidadeNova());
             System.out.println("Status antigo: "+ auditoria.getStatusAntigo());

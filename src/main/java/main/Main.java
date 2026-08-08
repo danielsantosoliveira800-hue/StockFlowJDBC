@@ -41,5 +41,6 @@ public class Main {
 
         menu.exibir();
         scheduler.parar();
+        
     }
 }

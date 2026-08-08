@@ -1,7 +1,7 @@
 package service;
 
 import infrastructure.persistence.AuditoriaProdutosDAO;
-import dao.AuditoriaProdutosRepository;
+import domain.repository.AuditoriaProdutosRepository;
 import domain.model.AuditoriaProdutos;
 
 import java.util.List;

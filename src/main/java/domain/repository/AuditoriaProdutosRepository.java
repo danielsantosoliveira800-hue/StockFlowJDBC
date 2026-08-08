@@ -1,4 +1,4 @@
-package dao;
+package domain.repository;
 
 import domain.model.AuditoriaProdutos;
 

@@ -1,6 +1,6 @@
 package infrastructure.persistence;
 
-import dao.AuditoriaProdutosRepository;
+import domain.repository.AuditoriaProdutosRepository;
 import exception.PersistenciaException;
 import domain.model.AuditoriaProdutos;
 import infrastructure.ConnectionFactory;
